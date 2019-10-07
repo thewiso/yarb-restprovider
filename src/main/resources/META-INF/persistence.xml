@@ -1,0 +1,23 @@
+<persistence version="2.2" xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_2.xsd">
+
+	<persistence-unit name="YARB_DB_AUTH" >
+		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>	
+		<jta-data-source>jdbc/YARB_DS</jta-data-source>	
+		<class>de.prettytree.yarb.restprovider.auth.db.User</class>
+		
+		<properties>
+			<property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
+			
+			<property name="javax.persistence.schema-generation.database.action" value="none" />
+			<property name="javax.persistence.schema-generation.scripts.action" value="create" />
+			<property name="javax.persistence.schema-generation.scripts.create-target" value="E:\Dokumente\Coding\YARB\yarb-restprovider\createDDL.jdbc"/>
+			<!-- TODO: pfad ändern -->
+			
+		</properties>
+	</persistence-unit>
+
+</persistence>
+<!-- https://docs.jboss.org/hibernate/orm/5.2/userguide/html_single/Hibernate_User_Guide.html#configurations-hbmddl -->
+<!-- https://thoughts-on-java.org/standardized-schema-generation-data-loading-jpa-2-1/ -->

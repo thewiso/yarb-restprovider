@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" version="3.1">
+  <filter-mapping>
+    <filter-name>corsFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>user api</web-resource-name>
+      <url-pattern>/yarb/user</url-pattern>
+      <http-method-omission>OPTIONS</http-method-omission>
+    </web-resource-collection>
+    <auth-constraint>
+      <role-name>user</role-name>
+    </auth-constraint>
+  </security-constraint>
+  
+  <context-param>
+    <param-name>resteasy.role.based.security</param-name>
+    <param-value>true</param-value>
+  </context-param>
+</web-app>
+<!-- https://www.informatik-aktuell.de/entwicklung/programmiersprachen/authentication-mit-java-ee-8.html -->
+<!-- https://github.com/openknowledge/java-ee-8-security-api-example -->
