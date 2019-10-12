@@ -1,4 +1,4 @@
-package de.prettytree.yarb.restprovider.user.api;
+package de.prettytree.yarb.restprovider.api.user;
 
 import java.security.spec.KeySpec;
 

@@ -5,7 +5,8 @@ import javax.xml.bind.DatatypeConverter;
 import org.junit.Assert;
 import org.junit.Test;
 
-import de.prettytree.yarb.restprovider.user.api.HashException;
+import de.prettytree.yarb.restprovider.api.user.AuthUtils;
+import de.prettytree.yarb.restprovider.api.user.HashException;
 
 public class AuthUtilsTest {
 

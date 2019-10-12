@@ -1,4 +1,4 @@
-package de.prettytree.yarb.restprovider.authentication.api;
+package de.prettytree.yarb.restprovider.api.authentication;
 
 import java.util.Arrays;
 
@@ -14,11 +14,13 @@ import javax.persistence.criteria.Root;
 import javax.validation.Valid;
 import javax.ws.rs.core.Response;
 
+import de.prettytree.yarb.restprovider.api.infrastructure.security.TokenProvider;
+import de.prettytree.yarb.restprovider.api.user.AuthUtils;
+import de.prettytree.yarb.restprovider.api.user.HashException;
+import de.prettytree.yarb.restprovider.authentication.api.TokenApi;
 import de.prettytree.yarb.restprovider.authentication.model.LoginCredentials;
-import de.prettytree.yarb.restprovider.infrastructure.security.TokenProvider;
-import de.prettytree.yarb.restprovider.user.api.AuthUtils;
-import de.prettytree.yarb.restprovider.user.api.HashException;
-import de.prettytree.yarb.restprovider.user.db.User;
+import de.prettytree.yarb.restprovider.authentication.model.Token;
+import de.prettytree.yarb.restprovider.db.model.User;
 
 @Stateless
 public class TokenApiImpl implements TokenApi{
@@ -46,7 +48,7 @@ public class TokenApiImpl implements TokenApi{
 		criteriaQuery.select(userRoot).where(criteriaBuilder.equal(userRoot.get("userName"), username));
 		Query query = em.createQuery(criteriaQuery);
 		User user = (User) query.getSingleResult();
-		
+		//TODO: test!
 		if(user != null) {
 			byte[] hash = null;
 			try {
@@ -56,7 +58,9 @@ public class TokenApiImpl implements TokenApi{
 			}
 			
 			if(Arrays.equals(user.getPassword(), hash)) {
-				return Response.ok(tokenProvider.createToken(loginCredentials.getUsername().toLowerCase())).build();
+				Token retVal = new Token();
+				retVal.setTokenString(tokenProvider.createToken(loginCredentials.getUsername().toLowerCase()));
+				return Response.ok(retVal).build();
 			}
 			
 		}

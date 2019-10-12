@@ -1,4 +1,4 @@
-package de.prettytree.yarb.restprovider.infrastructure.security;
+package de.prettytree.yarb.restprovider.api.infrastructure.security;
 
 import java.io.InputStream;
 import java.security.KeyStore;
@@ -59,7 +59,7 @@ public class TokenProvider {
 	private String jwtKeyStoreEntryName;
 	
 	@PostConstruct
-	public void init() throws Exception {
+	public void init() {
 		try {
 			// TODO: passwort
 			InputStream inputStream = TokenProvider.class.getResourceAsStream(keyStorePath);
@@ -71,7 +71,7 @@ public class TokenProvider {
 			KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) ks.getEntry("yarp jwt", protParam);
 			privateKey = privateKeyEntry.getPrivateKey();
 		} catch (Exception e) {
-			throw new Exception("Could not load private key", e);
+			throw new RuntimeException("Could not load private key", e);
 		} 
 	}
 	

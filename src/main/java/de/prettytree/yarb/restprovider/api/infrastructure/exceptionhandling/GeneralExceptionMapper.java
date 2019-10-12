@@ -1,4 +1,4 @@
-package de.prettytree.yarb.restprovider.infrastructure.exceptionhandling;
+package de.prettytree.yarb.restprovider.api.infrastructure.exceptionhandling;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;

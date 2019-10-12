@@ -1,4 +1,4 @@
-package de.prettytree.yarb.restprovider.user.api;
+package de.prettytree.yarb.restprovider.api.user;
 
 import java.security.SecureRandom;
 
@@ -15,7 +15,8 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import javax.ws.rs.core.Response;
 
-import de.prettytree.yarb.restprovider.user.db.User;
+import de.prettytree.yarb.restprovider.db.model.User;
+import de.prettytree.yarb.restprovider.user.api.UsersApi;
 import de.prettytree.yarb.restprovider.user.model.PasswordWrapper;
 
 @Stateless

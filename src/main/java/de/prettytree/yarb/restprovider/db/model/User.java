@@ -1,28 +1,35 @@
-package de.prettytree.yarb.restprovider.user.db;
+package de.prettytree.yarb.restprovider.db.model;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="User")
+@Table(name = "User")
 public class User {
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
-	
-	@Column(unique=true, nullable=false)
+
+	@Column(unique = true, nullable = false)
 	private String userName;
-	
-	@Column(nullable=false)
+
+	@Column(nullable = false)
 	private byte[] salt;
-	
-	@Column(nullable=false)
+
+	@Column(nullable = false)
 	private byte[] password;
+
+	@OneToMany(mappedBy = "owner")
+	private List<Board> createdSessions = new ArrayList<>();
 
 	public Long getId() {
 		return id;
@@ -55,7 +62,13 @@ public class User {
 	public void setPassword(byte[] password) {
 		this.password = password;
 	}
-	
-	
-	
+
+	public List<Board> getCreatedSessions() {
+		return createdSessions;
+	}
+
+	public void setCreatedSessions(List<Board> createdSessions) {
+		this.createdSessions = createdSessions;
+	}
+
 }

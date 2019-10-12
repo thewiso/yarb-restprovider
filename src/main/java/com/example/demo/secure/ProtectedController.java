@@ -1,7 +1,5 @@
 package com.example.demo.secure;
 
-import javax.annotation.security.DenyAll;
-import javax.annotation.security.RolesAllowed;
 import javax.enterprise.context.RequestScoped;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;

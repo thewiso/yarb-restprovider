@@ -1,4 +1,4 @@
-package de.prettytree.yarb.restprovider.infrastructure.security;
+package de.prettytree.yarb.restprovider.api.infrastructure.security;
 
 import java.util.HashSet;
 import java.util.List;

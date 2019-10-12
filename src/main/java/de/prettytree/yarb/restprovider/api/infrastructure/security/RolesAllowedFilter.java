@@ -14,7 +14,10 @@
  * See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package de.prettytree.yarb.restprovider.infrastructure.security;
+package de.prettytree.yarb.restprovider.api.infrastructure.security;
+
+import java.io.IOException;
+import java.util.Arrays;
 
 import javax.annotation.Priority;
 import javax.annotation.security.PermitAll;
@@ -28,8 +31,6 @@ import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
-import java.io.IOException;
-import java.util.Arrays;
 
 /**
  * Implementation for https://github.com/eclipse-ee4j/jaxrs-api/issues/563

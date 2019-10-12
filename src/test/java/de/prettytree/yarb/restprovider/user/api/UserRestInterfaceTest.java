@@ -24,7 +24,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import de.prettytree.yarb.restprovider.user.db.User;
+import de.prettytree.yarb.restprovider.api.user.UserApiImpl;
+import de.prettytree.yarb.restprovider.db.model.User;
 import de.prettytree.yarb.restprovider.user.model.PasswordWrapper;
 
 @RunWith(Arquillian.class)

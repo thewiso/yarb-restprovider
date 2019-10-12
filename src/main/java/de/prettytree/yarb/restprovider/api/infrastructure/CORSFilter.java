@@ -1,6 +1,7 @@
-package de.prettytree.yarb.restprovider.infrastructure;
+package de.prettytree.yarb.restprovider.api.infrastructure;
 
 import java.io.IOException;
+
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
