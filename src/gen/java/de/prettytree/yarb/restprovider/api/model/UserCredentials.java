@@ -1,4 +1,4 @@
-package de.prettytree.yarb.restprovider.authentication.model;
+package de.prettytree.yarb.restprovider.api.model;
 
 import javax.validation.constraints.*;
 import javax.validation.Valid;
@@ -9,14 +9,14 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 
-public class LoginCredentials   {
+public class UserCredentials   {
   
   private @Valid String username;
   private @Valid String password;
 
   /**
    **/
-  public LoginCredentials username(String username) {
+  public UserCredentials username(String username) {
     this.username = username;
     return this;
   }
@@ -24,7 +24,7 @@ public class LoginCredentials   {
   
   @JsonProperty("username")
   @NotNull
- @Pattern(regexp="^[\\S]+$") @Size(min=4,max=20)  public String getUsername() {
+ @Pattern(regexp="^[^\\sA-Z]+$") @Size(min=4,max=20)  public String getUsername() {
     return username;
   }
   public void setUsername(String username) {
@@ -33,7 +33,7 @@ public class LoginCredentials   {
 
   /**
    **/
-  public LoginCredentials password(String password) {
+  public UserCredentials password(String password) {
     this.password = password;
     return this;
   }
@@ -57,9 +57,9 @@ public class LoginCredentials   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    LoginCredentials loginCredentials = (LoginCredentials) o;
-    return Objects.equals(this.username, loginCredentials.username) &&
-        Objects.equals(this.password, loginCredentials.password);
+    UserCredentials userCredentials = (UserCredentials) o;
+    return Objects.equals(this.username, userCredentials.username) &&
+        Objects.equals(this.password, userCredentials.password);
   }
 
   @Override
@@ -70,7 +70,7 @@ public class LoginCredentials   {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class LoginCredentials {\n");
+    sb.append("class UserCredentials {\n");
     
     sb.append("    username: ").append(toIndentedString(username)).append("\n");
     sb.append("    password: ").append(toIndentedString(password)).append("\n");

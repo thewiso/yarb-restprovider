@@ -10,9 +10,11 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 @Entity
-public class BoardColumn {
+@Table(name = "BOARD_COLUMN")
+public class DB_BoardColumn {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -22,10 +24,10 @@ public class BoardColumn {
 	private String name;
 
 	@ManyToOne(optional = false)
-	private Board board;
+	private DB_Board board;
 
 	@OneToMany(mappedBy = "boardColumn")
-	private List<BoardNote> boardNotes = new ArrayList<>();
+	private List<DB_BoardNote> boardNotes = new ArrayList<>();
 
 	public Long getId() {
 		return id;
@@ -43,19 +45,19 @@ public class BoardColumn {
 		this.name = name;
 	}
 
-	public Board getBoard() {
+	public DB_Board getBoard() {
 		return board;
 	}
 
-	public void setBoard(Board board) {
+	public void setBoard(DB_Board board) {
 		this.board = board;
 	}
 
-	public List<BoardNote> getBoardNotes() {
+	public List<DB_BoardNote> getBoardNotes() {
 		return boardNotes;
 	}
 
-	public void setBoardNotes(List<BoardNote> boardNotes) {
+	public void setBoardNotes(List<DB_BoardNote> boardNotes) {
 		this.boardNotes = boardNotes;
 	}
 

@@ -5,19 +5,22 @@
 	<persistence-unit name="YARB_DB_AUTH">
 		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
 		<jta-data-source>jdbc/YARB_DS</jta-data-source>
-		<class>de.prettytree.yarb.restprovider.db.model.User</class>
-		<class>de.prettytree.yarb.restprovider.db.model.Board</class>
-		<class>de.prettytree.yarb.restprovider.db.model.BoardColumn</class>
-		<class>de.prettytree.yarb.restprovider.db.model.BoardNote</class>
+		<class>de.prettytree.yarb.restprovider.db.model.DB_User</class>
+		<class>de.prettytree.yarb.restprovider.db.model.DB_Board</class>
+		<class>de.prettytree.yarb.restprovider.db.model.DB_BoardColumn</class>
+		<class>de.prettytree.yarb.restprovider.db.model.DB_BoardNote</class>
 
 
 		<properties>
 			<property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect" />
+			<property name="hibernate.hbm2ddl.delimiter" value=";"/>
 
 			<property name="javax.persistence.schema-generation.database.action" value="none" />
-			<property name="javax.persistence.schema-generation.scripts.action" value="create" />
+			<property name="javax.persistence.schema-generation.scripts.action" value="drop-and-create" />
 			<property name="javax.persistence.schema-generation.scripts.create-target"
-				value="C:\Coding\YARB\yarb-restprovider\createDDL.jdbc" />
+				value="C:\Coding\YARB\yarb-restprovider\createDDL.sql" />
+			<property name="javax.persistence.schema-generation.scripts.drop-target"
+				value="C:\Coding\YARB\yarb-restprovider\dropDDL.sql" />
 			<!-- TODO: pfad ändern -->
 
 		</properties>

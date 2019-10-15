@@ -1,16 +1,17 @@
-package de.prettytree.yarb.restprovider.user.api;
+package de.prettytree.yarb.restprovider.api.user;
 
 import java.io.File;
-import java.util.logging.Logger;
+import java.util.Arrays;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.WebApplicationException;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -23,16 +24,18 @@ import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import de.prettytree.yarb.restprovider.api.model.UserCredentials;
+import de.prettytree.yarb.restprovider.api.user.AuthUtils;
 import de.prettytree.yarb.restprovider.api.user.UserApiImpl;
-import de.prettytree.yarb.restprovider.db.model.User;
-import de.prettytree.yarb.restprovider.user.model.PasswordWrapper;
+import de.prettytree.yarb.restprovider.db.model.DB_User;
 
 @RunWith(Arquillian.class)
 //@TransactionManagement(TransactionManagementType.CONTAINER)
-public class UserRestInterfaceTest {
-	// TODO: auswechseln
-	private static Logger log = Logger.getLogger(UserRestInterfaceTest.class.getName());
+public class UserApiImplTest {
+	private static final Logger LOG = LoggerFactory.getLogger(UserApiImplTest.class);
 	//http://arquillian.org/guides/getting_started/?utm_source=cta
 
 	@PersistenceContext
@@ -58,52 +61,49 @@ public class UserRestInterfaceTest {
 	@Test
 	public void testCreateUserForExistingUser() throws Throwable {
 		String testUserName = "testUser1";
-		PasswordWrapper passwordWrapper = new PasswordWrapper();
-		passwordWrapper.setPassword("Password1234");
+		UserCredentials userCredentials = new UserCredentials();
+		userCredentials.setPassword("Password1234");
+		userCredentials.setUsername(testUserName);
 			
-		User user = new User();
+		DB_User user = new DB_User();
 		user.setPassword("1234".getBytes());
 		user.setSalt("4321".getBytes());
 		user.setUserName(testUserName);
 
 		em.persist(user);
-		Response response = userRestInterface.usersUsernamePut(testUserName, passwordWrapper);
-		Assert.assertTrue("Wrong response code for creating existing user: " + response.getStatus(),
-				response.getStatus() == 409);
-	}
-	
-	@Test
-	public void testCreateUserForNullParameter() throws Throwable {
-		String testUserName = "testUser1";
 		
-		Response response = userRestInterface.usersUsernamePut(testUserName, null);
-		System.out.println("STATUS: " + response.getStatus());
-		Assert.assertTrue("Wrong response code for null parameter: " + response.getStatus(),
-				response.getStatus() == 409);
+		WebApplicationException ex = null;
+		try {
+			userRestInterface.createUser(userCredentials);
+		}catch(WebApplicationException e) {
+			ex = e;
+		}
+		Assert.assertTrue("Wrong or no exception for creating existing user",
+				ex != null && ex.getResponse().getStatus() == 409);
 	}
-	
-	
+
 	@Test
 	public void testCreateUserForDBEntryCreated() throws Throwable {
 		String testUserName = "testUser2";
+		String testPassword = "Password1234";
 		
-		PasswordWrapper passwordWrapper = new PasswordWrapper();
-		passwordWrapper.setPassword("Password1234");
+		UserCredentials userCredentials = new UserCredentials();
+		userCredentials.setPassword(testPassword);
+		userCredentials.setUsername(testUserName);
 		
-		userRestInterface.usersUsernamePut(testUserName, passwordWrapper);
-		//TODO: check columns of new entry
+		userRestInterface.createUser(userCredentials);
+		
 		CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
-		CriteriaQuery<Object> criteriaQuery = criteriaBuilder.createQuery();
-		Root<User> user = criteriaQuery.from(User.class);
-		criteriaQuery.select(criteriaBuilder.count(user)).where(criteriaBuilder.equal(user.get("userName"), testUserName));
-		Query query = em.createQuery(criteriaQuery);
-
-		Long result = (Long) query.getSingleResult();		
+		CriteriaQuery<DB_User> criteriaQuery = criteriaBuilder.createQuery(DB_User.class);
+		Root<DB_User> userRoot = criteriaQuery.from(DB_User.class);
+		criteriaQuery.select(userRoot).where(criteriaBuilder.equal(userRoot.get("userName"), testUserName));
+		DB_User dbUser = em.createQuery(criteriaQuery).getSingleResult();
 		
-		Assert.assertTrue("User not in persisted in database",
-				result == 1);
+		byte[] hashedPassword = AuthUtils.hashPasswordWithSalt(testPassword, dbUser.getSalt());
 		
 		
-	}//TODO passwordlength
+		Assert.assertTrue("Password not persisted correctly",
+				Arrays.equals(hashedPassword, dbUser.getPassword()));
+	}
 	
 }

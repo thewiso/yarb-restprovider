@@ -1,4 +1,4 @@
-package de.prettytree.yarb.restprovider.authentication.model;
+package de.prettytree.yarb.restprovider.api.model;
 
 import javax.validation.constraints.*;
 import javax.validation.Valid;
@@ -9,24 +9,25 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 
-public class Token   {
+public class InternalErrorMessage   {
   
-  private @Valid String tokenString;
+  private @Valid String exceptionId;
 
   /**
    **/
-  public Token tokenString(String tokenString) {
-    this.tokenString = tokenString;
+  public InternalErrorMessage exceptionId(String exceptionId) {
+    this.exceptionId = exceptionId;
     return this;
   }
 
   
-  @JsonProperty("tokenString")
-  public String getTokenString() {
-    return tokenString;
+  @JsonProperty("exceptionId")
+  @NotNull
+  public String getExceptionId() {
+    return exceptionId;
   }
-  public void setTokenString(String tokenString) {
-    this.tokenString = tokenString;
+  public void setExceptionId(String exceptionId) {
+    this.exceptionId = exceptionId;
   }
 
 
@@ -38,21 +39,21 @@ public class Token   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    Token token = (Token) o;
-    return Objects.equals(this.tokenString, token.tokenString);
+    InternalErrorMessage internalErrorMessage = (InternalErrorMessage) o;
+    return Objects.equals(this.exceptionId, internalErrorMessage.exceptionId);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(tokenString);
+    return Objects.hash(exceptionId);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class Token {\n");
+    sb.append("class InternalErrorMessage {\n");
     
-    sb.append("    tokenString: ").append(toIndentedString(tokenString)).append("\n");
+    sb.append("    exceptionId: ").append(toIndentedString(exceptionId)).append("\n");
     sb.append("}");
     return sb.toString();
   }

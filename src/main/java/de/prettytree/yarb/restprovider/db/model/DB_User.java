@@ -12,8 +12,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "User")
-public class User {
+@Table(name = "USER")
+public class DB_User {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -29,7 +29,7 @@ public class User {
 	private byte[] password;
 
 	@OneToMany(mappedBy = "owner")
-	private List<Board> createdSessions = new ArrayList<>();
+	private List<DB_Board> createdSessions = new ArrayList<>();
 
 	public Long getId() {
 		return id;
@@ -63,11 +63,11 @@ public class User {
 		this.password = password;
 	}
 
-	public List<Board> getCreatedSessions() {
+	public List<DB_Board> getCreatedSessions() {
 		return createdSessions;
 	}
 
-	public void setCreatedSessions(List<Board> createdSessions) {
+	public void setCreatedSessions(List<DB_Board> createdSessions) {
 		this.createdSessions = createdSessions;
 	}
 

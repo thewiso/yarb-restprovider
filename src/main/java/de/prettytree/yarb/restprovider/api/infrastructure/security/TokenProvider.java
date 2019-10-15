@@ -14,103 +14,102 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import de.prettytree.yarb.restprovider.YARBRestProvider;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
-/**
- * @author Tobias
- *
- */
-/**
- * @author Tobias
- *
- */
 @ApplicationScoped
 public class TokenProvider {
-	
+
+	private static final Logger LOG = LoggerFactory.getLogger(TokenProvider.class);
+
 	private static final Map<String, Object> JWT_STATIC_CLAIMS = new HashMap<>();
 	private static final Map<String, Object> JWT_STATIC_HEADERS = new HashMap<>();
-	static {//TODO: AS JWS
-		//https://www.eclipse.org/community/eclipse_newsletter/2017/september/article2.php
-		JWT_STATIC_CLAIMS.put("iss", "https://server.example.com");
-		JWT_STATIC_CLAIMS.put("sub", "Jessie");
-		JWT_STATIC_CLAIMS.put("upn", "Jessie");
-		JWT_STATIC_CLAIMS.put("aud", "targetService");
-		JWT_STATIC_CLAIMS.put("groups", Arrays.asList("user", "protected"));
-		
-		
+
+	static {
+		// https://www.eclipse.org/community/eclipse_newsletter/2017/september/article2.php
+		JWT_STATIC_CLAIMS.put("iss", "YARB Restprovider");
+		JWT_STATIC_CLAIMS.put("groups", Arrays.asList(YARBRestProvider.USER_GROUP));
+
 		JWT_STATIC_HEADERS.put("typ", "JWT");
 		JWT_STATIC_HEADERS.put("alg", "RS256");
-		JWT_STATIC_HEADERS.put("kid", "TODO");//TODO
 	}
-	
+
 	private PrivateKey privateKey;
 
 	@Inject
-	@ConfigProperty(name="jwtKeyStorePath", defaultValue = "/yarp-jwt.keystore")
+	@ConfigProperty(name = "de.prettytree.yarb.restprovider.jwt.keyStorePath", defaultValue = "/yarp-jwt.keystore")
 	private String keyStorePath;
-	
+
 	@Inject
-	@ConfigProperty(name="jwtKeyStoreEntryName", defaultValue = "yarp jwt")
+	@ConfigProperty(name = "de.prettytree.yarb.restprovider.jwt.keyStoreEntryName", defaultValue = "yarp jwt")
 	private String jwtKeyStoreEntryName;
 	
+	@Inject
+	@ConfigProperty(name = "de.prettytree.yarb.restprovider.jwt.keyStorePassword", defaultValue = "")
+	private String jwtKeyStorePassword;
+	
+	@Inject
+	@ConfigProperty(name = "de.prettytree.yarb.restprovider.jwt.expirationTimeMilliseconds", defaultValue = "3600000") //1000 * 60 * 60
+	Long expirationTime;
+
 	@PostConstruct
 	public void init() {
 		try {
-			// TODO: passwort
 			InputStream inputStream = TokenProvider.class.getResourceAsStream(keyStorePath);
 			KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
 			ks.load(inputStream, null);
 			inputStream.close();
 
-			KeyStore.ProtectionParameter protParam = new KeyStore.PasswordProtection(new char[0]);
-			KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) ks.getEntry("yarp jwt", protParam);
+			KeyStore.ProtectionParameter protParam = new KeyStore.PasswordProtection("".toCharArray());
+			KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) ks.getEntry(jwtKeyStoreEntryName, protParam);
 			privateKey = privateKeyEntry.getPrivateKey();
 		} catch (Exception e) {
 			throw new RuntimeException("Could not load private key", e);
-		} 
+		}
 	}
-	
-	public String createToken(String userName) {
+
+	public String createToken(long userId) {
 		// https://github.com/jwtk/jjwt
 		// https://en.wikipedia.org/wiki/PKCS_8
-		// https://github.com/MicroProfileJWT/eclipse-newsletter-sep-2017
-
-		//TODO: username als sub!
-
+		// https://github.com/MicroProfileJWT/eclipse-newsletter-sep-2017				
         JwtBuilder builder = Jwts.builder()
         		.setHeader(JWT_STATIC_HEADERS)
         		.setClaims(JWT_STATIC_CLAIMS)
+        		.setSubject(String.valueOf(userId))
         		.setId(UUID.randomUUID().toString())
         		.setIssuedAt(new Date())
-        		.setExpiration(new Date((System.currentTimeMillis() + 1000 * 60 * 60)));//TODO länge
+        		.setExpiration(new Date((System.currentTimeMillis() + expirationTime)));
 
-        //TODO: log trace
-//        System.out.println(builder.compact());
+        if(LOG.isTraceEnabled()) {
+        	LOG.trace("Created token: {}", builder.compact());
+        }
         
         return builder
         		.signWith(privateKey, SignatureAlgorithm.RS256)
         		.compact();
 	}
-	
-	
+
 	/**
 	 * returns a JWT object, if the token is valid
+	 * 
 	 * @param tokenString The plain JWT string
 	 * @return A JWT object, if the token is valid. Otherwise null is returned
 	 */
 	public Jws<Claims> parseValidToken(String tokenString) {
-		Jws<Claims> retVal = null; 
-		try{
+		Jws<Claims> retVal = null;
+		try {
 			retVal = Jwts.parser().setSigningKey(privateKey).parseClaimsJws(tokenString);
-		}catch(Exception e) {
-			//TODO: log trace
+		} catch (Exception e) {
+			LOG.debug("Could not parse token: ", e);
 		}
-		
+
 		return retVal;
 	}
 }

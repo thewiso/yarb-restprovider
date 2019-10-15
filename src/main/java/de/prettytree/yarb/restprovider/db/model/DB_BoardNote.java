@@ -8,9 +8,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 @Entity
-public class BoardNote {
+@Table(name = "BOARD_NOTE")
+public class DB_BoardNote {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -23,14 +25,13 @@ public class BoardNote {
 	private String author;
 
 	@Column(nullable = false)
-	private long votes;
+	private long votes = 0;
 
 	@Column(nullable = false)
 	private LocalDateTime createdAt;
 
-	@Column(nullable = false)
 	@ManyToOne(optional = false)
-	private BoardColumn boardColumn;
+	private DB_BoardColumn boardColumn;
 
 	public Long getId() {
 		return id;
@@ -72,11 +73,11 @@ public class BoardNote {
 		this.createdAt = createdAt;
 	}
 
-	public BoardColumn getBoardColumn() {
+	public DB_BoardColumn getBoardColumn() {
 		return boardColumn;
 	}
 
-	public void setBoardColumn(BoardColumn boardColumn) {
+	public void setBoardColumn(DB_BoardColumn boardColumn) {
 		this.boardColumn = boardColumn;
 	}
 

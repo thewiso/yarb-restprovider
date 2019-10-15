@@ -13,6 +13,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.HttpHeaders;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 
@@ -20,9 +23,12 @@ import io.jsonwebtoken.Jws;
 @ApplicationScoped
 public class JwtAuthenticationMechanism implements HttpAuthenticationMechanism {
 
+	private static final Logger LOG = LoggerFactory.getLogger(JwtAuthenticationMechanism.class);
+
 	@Inject
 	TokenProvider tokenProvider;
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public AuthenticationStatus validateRequest(HttpServletRequest request, HttpServletResponse response,
 			HttpMessageContext context) throws AuthenticationException {
@@ -31,18 +37,23 @@ public class JwtAuthenticationMechanism implements HttpAuthenticationMechanism {
 			return context.doNothing();
 		}
 
-		String header = request.getHeader(HttpHeaders.AUTHORIZATION);
-		if (header == null) {
-			return context.responseUnauthorized();
+		try {
+			String header = request.getHeader(HttpHeaders.AUTHORIZATION);
+			if (header == null) {
+				return context.responseUnauthorized();
+			}
+
+			String[] headerComponents = header.split(" ");
+			String tokenString = headerComponents[1];
+			Jws<Claims> token = tokenProvider.parseValidToken(tokenString);
+			if (token != null) {
+				return context.notifyContainerAboutLogin(token.getBody().getSubject(),
+						new HashSet<>(token.getBody().get("groups", List.class)));
+			}
+		} catch (Exception e) {
+			LOG.debug("Unable to validate authorisation header", e);
 		}
 
-		String[] headerComponents = header.split(" ");
-		String tokenString = headerComponents[1];
-		Jws<Claims> token = tokenProvider.parseValidToken(tokenString);
-		if(token != null) {
-			return context.notifyContainerAboutLogin(token.getBody().getSubject(), new HashSet<>(token.getBody().get("groups", List.class)));
-		}else {
-			return context.responseUnauthorized();
-		}
+		return context.responseUnauthorized();
 	}
 }

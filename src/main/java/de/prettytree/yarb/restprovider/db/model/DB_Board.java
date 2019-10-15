@@ -11,9 +11,11 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 @Entity
-public class Board {
+@Table(name = "BOARD")
+public class DB_Board {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -23,13 +25,13 @@ public class Board {
 	private String name;
 
 	@ManyToOne(optional = false)
-	private User owner;
+	private DB_User owner;
 
 	@Column(nullable = false)
 	private LocalDateTime createdAt;
 
 	@OneToMany(mappedBy = "board")
-	private List<BoardColumn> boardColumns = new ArrayList<>();
+	private List<DB_BoardColumn> boardColumns = new ArrayList<>();
 
 	public Long getId() {
 		return id;
@@ -47,11 +49,11 @@ public class Board {
 		this.name = name;
 	}
 
-	public User getOwner() {
+	public DB_User getOwner() {
 		return owner;
 	}
 
-	public void setOwner(User owner) {
+	public void setOwner(DB_User owner) {
 		this.owner = owner;
 	}
 
@@ -63,11 +65,11 @@ public class Board {
 		this.createdAt = createdAt;
 	}
 
-	public List<BoardColumn> getBoardColumns() {
+	public List<DB_BoardColumn> getBoardColumns() {
 		return boardColumns;
 	}
 
-	public void setBoardColumns(List<BoardColumn> boardColumns) {
+	public void setBoardColumns(List<DB_BoardColumn> boardColumns) {
 		this.boardColumns = boardColumns;
 	}
 
