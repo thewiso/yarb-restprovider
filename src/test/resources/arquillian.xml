@@ -6,13 +6,13 @@
 	<container qualifier="jboss" default="true">
 		<configuration>
 			<!-- http://www.mastertheboss.com/jboss-frameworks/arquillian/arquillian-tutorial -->
-			<property name="jbossHome">E:\Dokumente\Coding\account-analyzer\wildfly-17.0.0.Final</property>
+			<!-- the variable is defined in pom.xml -->
+			<property name="jbossHome">${JBOSS_DIR}</property>
 		</configuration>
 	</container>
 	<container qualifier="jbossDebug">
 		<configuration>
-			<!-- http://www.mastertheboss.com/jboss-frameworks/arquillian/arquillian-tutorial -->
-			<property name="jbossHome">E:\Dokumente\Coding\account-analyzer\wildfly-17.0.0.Final</property>
+			<property name="jbossHome">${JBOSS_DIR}</property>
 			<property name="javaVmArguments">-agentlib:jdwp=transport=dt_socket,address=8787,server=y,suspend=y</property>
 		</configuration>
 	</container>

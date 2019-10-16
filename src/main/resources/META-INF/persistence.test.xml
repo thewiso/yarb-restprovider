@@ -4,14 +4,16 @@
 
 	<persistence-unit name="ACCOUNT_ANALYZER_DB_TEST" transaction-type="JTA">
 		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
-		<jta-data-source>java:jboss/datasources/AccountAnalayzerTest</jta-data-source>
-		<class>de.prettytree.accountAnalyzerRestProvider.auth.db.User</class>
+		<jta-data-source>jdbc/YARB_DS_TEST</jta-data-source>
+		<class>de.prettytree.yarb.restprovider.db.model.DB_User</class>
+		<class>de.prettytree.yarb.restprovider.db.model.DB_Board</class>
+		<class>de.prettytree.yarb.restprovider.db.model.DB_BoardColumn</class>
+		<class>de.prettytree.yarb.restprovider.db.model.DB_BoardNote</class>
 		
 		<properties>
+			<property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect" />
 			<property name="javax.persistence.schema-generation.database.action" value="drop-and-create" />
 
-			<property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect" />
-			<!-- <property name="hibernate.hbm2ddl.auto" value="create" /> -->
 		</properties>
 	</persistence-unit>
 </persistence>

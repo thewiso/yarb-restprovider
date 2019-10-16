@@ -12,6 +12,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -27,6 +28,7 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.prettytree.yarb.restprovider.api.infrastructure.exceptionhandling.HttpResponseException;
 import de.prettytree.yarb.restprovider.api.model.UserCredentials;
 import de.prettytree.yarb.restprovider.api.user.AuthUtils;
 import de.prettytree.yarb.restprovider.api.user.UserApiImpl;
@@ -50,7 +52,9 @@ public class UserApiImplTest {
 		        .importRuntimeDependencies().resolve().withTransitivity().asFile();
 		
 		return ShrinkWrap.create(WebArchive.class, "test.war")
-            .addPackages(true, "de.prettytree.accountAnalyzerRestProvider")
+            .addPackages(true, "de.prettytree.yarb.restprovider.api")
+            .addPackages(true, "de.prettytree.yarb.restprovider.db")
+            .addPackages(true, "de.prettytree.yarb.restprovider.mapping")
             .addAsResource("META-INF/persistence.test.xml", "META-INF/persistence.xml")
             .addAsWebInfResource(EmptyAsset.INSTANCE, ArchivePaths.create("beans.xml"))
             .addAsLibraries(files);
@@ -60,7 +64,7 @@ public class UserApiImplTest {
 	@Transactional
 	@Test
 	public void testCreateUserForExistingUser() throws Throwable {
-		String testUserName = "testUser1";
+		String testUserName = "testuser1";
 		UserCredentials userCredentials = new UserCredentials();
 		userCredentials.setPassword("Password1234");
 		userCredentials.setUsername(testUserName);
@@ -84,14 +88,21 @@ public class UserApiImplTest {
 
 	@Test
 	public void testCreateUserForDBEntryCreated() throws Throwable {
-		String testUserName = "testUser2";
+		String testUserName = "testuser2";
 		String testPassword = "Password1234";
 		
 		UserCredentials userCredentials = new UserCredentials();
 		userCredentials.setPassword(testPassword);
 		userCredentials.setUsername(testUserName);
 		
-		userRestInterface.createUser(userCredentials);
+		HttpResponseException exception = null;
+		try {
+			userRestInterface.createUser(userCredentials);
+		}catch(HttpResponseException e) {
+			exception = e;
+		}
+		
+		Assert.assertEquals(exception.getResponse().getStatus(), Response.Status.CREATED.getStatusCode());
 		
 		CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
 		CriteriaQuery<DB_User> criteriaQuery = criteriaBuilder.createQuery(DB_User.class);

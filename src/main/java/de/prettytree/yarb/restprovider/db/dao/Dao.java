@@ -18,7 +18,7 @@ import javax.transaction.UserTransaction;
 @ApplicationScoped
 @Transactional
 public abstract class Dao<DbModelClass> {
-	// TODO: MULTITHREADING-FÄHIG?!
+	// TODO: MULTITHREADING-FÃ„HIG?!
 	@PersistenceContext
 	protected EntityManager em;
 	

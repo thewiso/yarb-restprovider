@@ -2,10 +2,8 @@
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
 	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>de.prettytree</groupId>
-	<!-- TODO: -->
-	<!-- https://www.mkyong.com/maven/maven-profiles-example/ -->
-	<artifactId>yarb-restprovider</artifactId>
+	<groupId>de.prettytree.yarb</groupId>
+	<artifactId>restprovider</artifactId>
 	<version>1.0-SNAPSHOT</version>
 	<packaging>war</packaging>
 
@@ -111,6 +109,10 @@
 	<profiles>
 		<profile>
 			<id>arquillian-wildfly</id>
+			<!-- Define default properties that can also be provided with an argument -->
+			<properties>
+				<jbossdir>DEFAULT</jbossdir>
+			</properties>
 			<dependencies>
 				<dependency>
 					<groupId>org.wildfly.arquillian</groupId>
@@ -124,12 +126,20 @@
 					<plugin>
 						<artifactId>maven-surefire-plugin</artifactId>
 						<version>2.22.2</version>
+						<configuration>
+							<systemPropertyVariables>
+								<JBOSS_DIR>${jbossdir}</JBOSS_DIR>
+							</systemPropertyVariables>
+						</configuration>
 					</plugin>
 				</plugins>
 			</build>
 		</profile>
 		<profile>
 			<id>arquillian-wildfly-debug</id>
+			<properties>
+				<jbossdir>DEFAULT</jbossdir>
+			</properties>
 			<dependencies>
 				<dependency>
 					<groupId>org.wildfly.arquillian</groupId>
@@ -146,6 +156,7 @@
 						<configuration>
 							<systemPropertyVariables>
 								<arquillian.launch>jbossDebug</arquillian.launch>
+								<JBOSS_DIR>${jbossdir}</JBOSS_DIR>
 							</systemPropertyVariables>
 						</configuration>
 					</plugin>
@@ -158,30 +169,14 @@
 		<finalName>${project.artifactId}</finalName>
 		<pluginManagement>
 			<plugins>
-				<!-- display active profile in compile phase -->
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-help-plugin</artifactId>
-					<version>3.2.0</version>
-					<executions>
-						<execution>
-							<id>show-profiles</id>
-							<phase>compile</phase>
-							<goals>
-								<goal>active-profiles</goal>
-							</goals>
-						</execution>
-					</executions>
-				</plugin>
-
 				<!-- add src/gen/java to build path -->
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>build-helper-maven-plugin</artifactId>
-					<version>3.0</version>
+					<version>3.0.0</version>
 					<executions>
 						<execution>
-							<id>add-source</id>
+							<id>add-gen-source</id>
 							<phase>generate-sources</phase>
 							<goals>
 								<goal>add-source</goal>
@@ -194,9 +189,14 @@
 						</execution>
 					</executions>
 				</plugin>
-
 			</plugins>
 		</pluginManagement>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
 
 	</build>
 
