@@ -33,7 +33,6 @@ public class AuthApiImpl implements AuthApi {
 	@Override
 	public LoginData login(@Valid UserCredentials userCredentials) {
 		Optional<DB_User> user = userDao.findByUserName(userCredentials.getUsername());
-		// TODO: test!
 		if (user.isPresent()) {
 			byte[] hash = null;
 			try {

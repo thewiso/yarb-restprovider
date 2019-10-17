@@ -91,6 +91,7 @@ public class AuthApiImplTest {
 		userCredentials.setUsername(userName);
 		User user = authApi.login(userCredentials).getUser();
 				
+		//TODO: mock tokenprovider
 		
 		Assert.assertEquals(dbUser.getId().longValue(), user.getId().longValue());
 		Assert.assertEquals(dbUser.getUserName(), user.getUsername());
