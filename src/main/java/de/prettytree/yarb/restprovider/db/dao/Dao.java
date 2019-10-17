@@ -38,27 +38,25 @@ public abstract class Dao<DbModelClass> {
 		criteriaBuilder = em.getCriteriaBuilder();
 	}
 
-	//TODO: TEST
-	public Optional<DbModelClass> get(long id){
+	public Optional<DbModelClass> find(long id){
 		DbModelClass user = em.find(modelClass, id);
 		return Optional.ofNullable(user);
 	}
 
-	//TODO: TEST
-	public List<DbModelClass> getAll(){
+	public List<DbModelClass> findAll(){
 		CriteriaQuery<DbModelClass> criteriaQuery = criteriaBuilder.createQuery(modelClass);
 		criteriaQuery.select(criteriaQuery.from(modelClass));
 		List<DbModelClass> retVal = em.createQuery(criteriaQuery).getResultList();
 		return retVal;
 	}
 
-	//TODO: TEST
 	public void save(DbModelClass dbModelClass) {
 		em.persist(dbModelClass);
 	}
 
 //	public abstract void update(DbModelClass dbModelClass, String[] params);
 
+	//TODO: test
 	public void delete(DbModelClass dbModelClass) {
 		em.remove(dbModelClass);
 	}

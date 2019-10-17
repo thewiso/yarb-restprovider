@@ -63,7 +63,7 @@ public class UserApiImpl implements UsersApi {
 	@Override
 	public User getUser(Integer userId) {
 		if(securityContext.getCallerPrincipal().getName().equals(userId.toString())) {
-			Optional<DB_User> dbUser = userDao.get(userId);
+			Optional<DB_User> dbUser = userDao.find(userId);
 			if(dbUser.isPresent()) {
 				return userMapper.map(dbUser.get());
 			}else {

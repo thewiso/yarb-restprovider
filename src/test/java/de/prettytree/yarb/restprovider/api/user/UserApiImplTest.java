@@ -35,7 +35,6 @@ import de.prettytree.yarb.restprovider.api.user.UserApiImpl;
 import de.prettytree.yarb.restprovider.db.model.DB_User;
 
 @RunWith(Arquillian.class)
-//@TransactionManagement(TransactionManagementType.CONTAINER)
 public class UserApiImplTest {
 	private static final Logger LOG = LoggerFactory.getLogger(UserApiImplTest.class);
 	//http://arquillian.org/guides/getting_started/?utm_source=cta
@@ -55,7 +54,7 @@ public class UserApiImplTest {
             .addPackages(true, "de.prettytree.yarb.restprovider.api")
             .addPackages(true, "de.prettytree.yarb.restprovider.db")
             .addPackages(true, "de.prettytree.yarb.restprovider.mapping")
-            .addAsResource("META-INF/persistence.test.xml", "META-INF/persistence.xml")
+            .addAsResource("persistence.xml", "META-INF/persistence.xml")
             .addAsWebInfResource(EmptyAsset.INSTANCE, ArchivePaths.create("beans.xml"))
             .addAsLibraries(files);
     }

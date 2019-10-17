@@ -10,6 +10,9 @@
 		<class>de.prettytree.yarb.restprovider.db.model.DB_BoardColumn</class>
 		<class>de.prettytree.yarb.restprovider.db.model.DB_BoardNote</class>
 		
+		<class>de.prettytree.yarb.restprovider.db.model.TestEntity</class>
+		
+		
 		<properties>
 			<property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect" />
 			<property name="javax.persistence.schema-generation.database.action" value="drop-and-create" />
@@ -18,3 +21,5 @@
 	</persistence-unit>
 </persistence>
 <!-- https://www.vogella.com/tutorials/JavaPersistenceAPI/article.html -->
+
+<!-- TODO: file to src/test/recources  ! -->
