@@ -15,11 +15,10 @@
 		
 		<properties>
 			<property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect" />
+			<property name="hibernate.jdbc.time_zone" value="UTC"/>
 			<property name="javax.persistence.schema-generation.database.action" value="drop-and-create" />
 
 		</properties>
 	</persistence-unit>
 </persistence>
 <!-- https://www.vogella.com/tutorials/JavaPersistenceAPI/article.html -->
-
-<!-- TODO: file to src/test/recources  ! -->

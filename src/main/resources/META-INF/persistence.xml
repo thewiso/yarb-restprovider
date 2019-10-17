@@ -21,8 +21,6 @@
 				value="C:\Coding\YARB\yarb-restprovider\createDDL.sql" />
 			<property name="javax.persistence.schema-generation.scripts.drop-target"
 				value="C:\Coding\YARB\yarb-restprovider\dropDDL.sql" />
-			<!-- TODO: pfad ändern -->
-
 		</properties>
 	</persistence-unit>
 

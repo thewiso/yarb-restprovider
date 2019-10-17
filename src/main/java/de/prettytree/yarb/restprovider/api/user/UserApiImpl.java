@@ -35,7 +35,7 @@ public class UserApiImpl implements UsersApi {
 
 	@Override
 	public void createUser(@Valid UserCredentials userCredentials) {
-		Optional<DB_User> existingUser = userDao.get(userCredentials.getUsername());
+		Optional<DB_User> existingUser = userDao.findByUserName(userCredentials.getUsername());
 		if (!existingUser.isPresent()) {
 			byte[] salt = new byte[AuthUtils.HASH_LENGTH];
 			random.nextBytes(salt);
@@ -60,6 +60,7 @@ public class UserApiImpl implements UsersApi {
 
 	}
 
+	//TODO: test
 	@Override
 	public User getUser(Integer userId) {
 		if(securityContext.getCallerPrincipal().getName().equals(userId.toString())) {

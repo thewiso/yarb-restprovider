@@ -14,8 +14,7 @@ public class UserDao extends Dao<DB_User> {
 		super(DB_User.class);
 	}
 
-	//TODO: TEST
-	public Optional<DB_User> get(String username) {
+	public Optional<DB_User> findByUserName(String username) {
 		CriteriaQuery<DB_User> criteriaQuery = criteriaBuilder.createQuery(DB_User.class);
 		Root<DB_User> userRoot = criteriaQuery.from(DB_User.class);
 		criteriaQuery.select(userRoot).where(criteriaBuilder.equal(userRoot.get("userName"), username));

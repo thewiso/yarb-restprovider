@@ -56,13 +56,11 @@ public abstract class Dao<DbModelClass> {
 
 //	public abstract void update(DbModelClass dbModelClass, String[] params);
 
-	//TODO: test
 	public void delete(DbModelClass dbModelClass) {
 		em.remove(dbModelClass);
 	}
 
-	//TODO: TEST
-	protected Optional<DbModelClass> getSingleResultOptional(TypedQuery<DbModelClass> query) {
+	protected Optional<DbModelClass> getSingleResultOptional(TypedQuery<DbModelClass> query) throws NonUniqueResultException{
 		List<DbModelClass> results = query.getResultList();
 		Optional<DbModelClass> retVal;
 		if (results.isEmpty()) {

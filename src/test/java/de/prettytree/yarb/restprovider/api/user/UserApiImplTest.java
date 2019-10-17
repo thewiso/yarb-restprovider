@@ -6,8 +6,6 @@ import java.util.Arrays;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
-import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
@@ -23,44 +21,50 @@ import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import de.prettytree.yarb.restprovider.api.infrastructure.exceptionhandling.HttpResponseException;
 import de.prettytree.yarb.restprovider.api.model.UserCredentials;
-import de.prettytree.yarb.restprovider.api.user.AuthUtils;
-import de.prettytree.yarb.restprovider.api.user.UserApiImpl;
 import de.prettytree.yarb.restprovider.db.model.DB_User;
+import de.prettytree.yarb.restprovider.test.TestUtils;
 
 @RunWith(Arquillian.class)
+@Transactional
 public class UserApiImplTest {
-	private static final Logger LOG = LoggerFactory.getLogger(UserApiImplTest.class);
 	//http://arquillian.org/guides/getting_started/?utm_source=cta
 
 	@PersistenceContext
 	private EntityManager em;
 	
 	@Inject
-	private UserApiImpl userRestInterface;
+	private UserApiImpl userApi;
 	
 	@Deployment
     public static WebArchive createDeployment() {
 		File[] files = Maven.resolver().loadPomFromFile("pom.xml")
-		        .importRuntimeDependencies().resolve().withTransitivity().asFile();
+				.importRuntimeAndTestDependencies()
+		        .resolve()
+		        .withTransitivity()
+		        .asFile();
 		
-		return ShrinkWrap.create(WebArchive.class, "test.war")
+		return ShrinkWrap.create(WebArchive.class, UserApiImplTest.class.getSimpleName() + ".war")
             .addPackages(true, "de.prettytree.yarb.restprovider.api")
             .addPackages(true, "de.prettytree.yarb.restprovider.db")
             .addPackages(true, "de.prettytree.yarb.restprovider.mapping")
+            .addPackages(true, "de.prettytree.yarb.restprovider.test")
             .addAsResource("persistence.xml", "META-INF/persistence.xml")
             .addAsWebInfResource(EmptyAsset.INSTANCE, ArchivePaths.create("beans.xml"))
             .addAsLibraries(files);
     }
 	
+	@Before
+	public void clearTestEntityTable() {
+		TestUtils.truncateTable(em, DB_User.class);
+	}
 	
-	@Transactional
+	
 	@Test
 	public void testCreateUserForExistingUser() throws Throwable {
 		String testUserName = "testuser1";
@@ -77,7 +81,7 @@ public class UserApiImplTest {
 		
 		WebApplicationException ex = null;
 		try {
-			userRestInterface.createUser(userCredentials);
+			userApi.createUser(userCredentials);
 		}catch(WebApplicationException e) {
 			ex = e;
 		}
@@ -87,8 +91,8 @@ public class UserApiImplTest {
 
 	@Test
 	public void testCreateUserForDBEntryCreated() throws Throwable {
-		String testUserName = "testuser2";
-		String testPassword = "Password1234";
+		String testUserName = TestUtils.getRandomString10();
+		String testPassword = TestUtils.getRandomString20();
 		
 		UserCredentials userCredentials = new UserCredentials();
 		userCredentials.setPassword(testPassword);
@@ -96,7 +100,7 @@ public class UserApiImplTest {
 		
 		HttpResponseException exception = null;
 		try {
-			userRestInterface.createUser(userCredentials);
+			userApi.createUser(userCredentials);
 		}catch(HttpResponseException e) {
 			exception = e;
 		}
@@ -114,6 +118,6 @@ public class UserApiImplTest {
 		
 		Assert.assertTrue("Password not persisted correctly",
 				Arrays.equals(hashedPassword, dbUser.getPassword()));
-	}
+	}	
 	
 }
