@@ -75,6 +75,7 @@ public class TokenProvider {
 		}
 	}
 
+	//TODO: TEST
 	public String createToken(long userId) {
 		// https://github.com/jwtk/jjwt
 		// https://en.wikipedia.org/wiki/PKCS_8
@@ -102,6 +103,7 @@ public class TokenProvider {
 	 * @param tokenString The plain JWT string
 	 * @return A JWT object, if the token is valid. Otherwise null is returned
 	 */
+	//TODO: TEST
 	public Jws<Claims> parseValidToken(String tokenString) {
 		Jws<Claims> retVal = null;
 		try {

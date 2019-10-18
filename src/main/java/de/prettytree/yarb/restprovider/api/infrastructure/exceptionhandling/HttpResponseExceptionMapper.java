@@ -20,6 +20,7 @@ public class HttpResponseExceptionMapper implements ExceptionMapper<HttpResponse
 	
 	@Override
 	public Response toResponse(HttpResponseException exception) {
+		//TODO: replace with NotFoundException etc?
 		if (exception.getResponse().getStatusInfo().getFamily() == Response.Status.Family.SERVER_ERROR) {
 			Throwable throwable = exception;
 			if(throwable.getCause() != null) {
