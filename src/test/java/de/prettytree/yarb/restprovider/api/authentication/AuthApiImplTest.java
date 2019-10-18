@@ -43,13 +43,15 @@ public class AuthApiImplTest {
 		File[] files = Maven.resolver().loadPomFromFile("pom.xml").importRuntimeAndTestDependencies().resolve()
 				.withTransitivity().asFile();
 
-		return ShrinkWrap.create(WebArchive.class, UserApiImplTest.class.getSimpleName() + ".war")
+		return ShrinkWrap.create(WebArchive.class, AuthApiImplTest.class.getSimpleName() + ".war")
 				.addPackages(true, "de.prettytree.yarb.restprovider.api")
 				.addPackages(true, "de.prettytree.yarb.restprovider.db")
 				.addPackages(true, "de.prettytree.yarb.restprovider.mapping")
 				.addPackages(true, "de.prettytree.yarb.restprovider.test")
+				.addAsResource("yarb-jwt.keystore")
 				.addAsResource("persistence.xml", "META-INF/persistence.xml")
-				.addAsWebInfResource(EmptyAsset.INSTANCE, ArchivePaths.create("beans.xml")).addAsLibraries(files);
+				.addAsWebInfResource(EmptyAsset.INSTANCE, ArchivePaths.create("beans.xml"))
+				.addAsLibraries(files);
 	}
 
 	@Before
@@ -59,11 +61,12 @@ public class AuthApiImplTest {
 
 	@Test()
 	public void testLoginWithoutUser() {
+		Assert.assertNotNull(getClass().getClassLoader().getResourceAsStream("yarb-jwt.keystore"));
 		WebApplicationException exception = null;
 		try {
 			UserCredentials userCredentials = new UserCredentials();
 			userCredentials.setPassword(TestUtils.getRandomString20());
-			userCredentials.setUsername(TestUtils.getRandomString10());
+			userCredentials.setUsername(TestUtils.getRandomStringAlphabetic10().toLowerCase());
 			authApi.login(userCredentials);
 		} catch (WebApplicationException e) {
 			exception = e;
@@ -75,6 +78,8 @@ public class AuthApiImplTest {
 	
 	@Test()
 	public void testLoginWithUser() throws Throwable {
+		Assert.assertNotNull(getClass().getClassLoader().getResourceAsStream("yarb-jwt.keystore"));
+
 		String userName = TestUtils.getRandomString10();
 		String password = TestUtils.getRandomString20();
 		byte[] salt = TestUtils.getRandomByteArray();

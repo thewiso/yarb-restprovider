@@ -44,7 +44,7 @@ public class TokenProvider {
 	private PrivateKey privateKey;
 
 	@Inject
-	@ConfigProperty(name = "de.prettytree.yarb.restprovider.jwt.keyStorePath", defaultValue = "/yarp-jwt.keystore")
+	@ConfigProperty(name = "de.prettytree.yarb.restprovider.jwt.keyStorePath", defaultValue = "yarp-jwt.keystore")
 	private String keyStorePath;
 
 	@Inject
@@ -62,7 +62,7 @@ public class TokenProvider {
 	@PostConstruct
 	public void init() {
 		try {
-			InputStream inputStream = TokenProvider.class.getResourceAsStream(keyStorePath);
+			InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(keyStorePath);
 			KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
 			ks.load(inputStream, null);
 			inputStream.close();

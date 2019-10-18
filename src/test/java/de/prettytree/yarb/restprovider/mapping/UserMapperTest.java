@@ -13,7 +13,7 @@ public class UserMapperTest {
 	public void testUserMapperFromDbToRestModel() {
 		DB_User dbUser = new DB_User();
 		dbUser.setUserName(TestUtils.getRandomString20());
-		dbUser.setId(new Long(TestUtils.getRandomInt()));
+		dbUser.setId(Long.valueOf(TestUtils.getRandomInt()));
 		
 		User user = new UserMapper().map(dbUser);
 		

@@ -152,6 +152,7 @@
 			<id>arquillian-wildfly-debug</id>
 			<properties>
 				<jbossdir>DEFAULT</jbossdir>
+				<javaHome>${JAVA_HOME}</javaHome>
 			</properties>
 			<dependencies>
 				<dependency>
@@ -170,6 +171,7 @@
 							<systemPropertyVariables>
 								<arquillian.launch>jbossDebug</arquillian.launch>
 								<JBOSS_DIR>${jbossdir}</JBOSS_DIR>
+								<JAVA_HOME>${javaHome}</JAVA_HOME>
 							</systemPropertyVariables>
 						</configuration>
 					</plugin>

@@ -34,6 +34,10 @@ public class TestUtils {
 	public static String getRandomString20() {
 		return RandomStringUtils.random(20);
 	}
+	
+	public static String getRandomStringAlphabetic10() {
+		return RandomStringUtils.randomAlphabetic(10);
+	}
 
 	public static byte[] getRandomByteArray() {
 		return RandomStringUtils.random(20).getBytes(StandardCharsets.UTF_8);

@@ -91,7 +91,7 @@ public class UserApiImplTest {
 
 	@Test
 	public void testCreateUserForDBEntryCreated() throws Throwable {
-		String testUserName = TestUtils.getRandomString10();
+		String testUserName = TestUtils.getRandomStringAlphabetic10().toLowerCase();
 		String testPassword = TestUtils.getRandomString20();
 		
 		UserCredentials userCredentials = new UserCredentials();
