@@ -123,6 +123,7 @@
 			<!-- Define default properties that can also be provided with an argument -->
 			<properties>
 				<jbossdir>DEFAULT</jbossdir>
+				<javaHome>${JAVA_HOME}</javaHome>
 			</properties>
 			<dependencies>
 				<dependency>
@@ -140,6 +141,7 @@
 						<configuration>
 							<systemPropertyVariables>
 								<JBOSS_DIR>${jbossdir}</JBOSS_DIR>
+								<JAVA_HOME>${javaHome}</JAVA_HOME>
 							</systemPropertyVariables>
 						</configuration>
 					</plugin>
