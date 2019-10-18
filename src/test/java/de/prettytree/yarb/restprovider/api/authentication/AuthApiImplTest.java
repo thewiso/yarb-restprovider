@@ -61,7 +61,6 @@ public class AuthApiImplTest {
 
 	@Test()
 	public void testLoginWithoutUser() {
-		Assert.assertNotNull(getClass().getClassLoader().getResourceAsStream("yarb-jwt.keystore"));
 		WebApplicationException exception = null;
 		try {
 			UserCredentials userCredentials = new UserCredentials();
@@ -78,8 +77,6 @@ public class AuthApiImplTest {
 	
 	@Test()
 	public void testLoginWithUser() throws Throwable {
-		Assert.assertNotNull(getClass().getClassLoader().getResourceAsStream("yarb-jwt.keystore"));
-
 		String userName = TestUtils.getRandomString10();
 		String password = TestUtils.getRandomString20();
 		byte[] salt = TestUtils.getRandomByteArray();

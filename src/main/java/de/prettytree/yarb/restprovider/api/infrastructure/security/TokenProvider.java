@@ -44,7 +44,7 @@ public class TokenProvider {
 	private PrivateKey privateKey;
 
 	@Inject
-	@ConfigProperty(name = "de.prettytree.yarb.restprovider.jwt.keyStorePath", defaultValue = "yarp-jwt.keystore")
+	@ConfigProperty(name = "de.prettytree.yarb.restprovider.jwt.keyStorePath", defaultValue = "yarb-jwt.keystore")
 	private String keyStorePath;
 
 	@Inject
