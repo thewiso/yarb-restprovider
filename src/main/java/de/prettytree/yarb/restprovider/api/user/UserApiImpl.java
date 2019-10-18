@@ -6,13 +6,16 @@ import java.util.Optional;
 import javax.inject.Inject;
 import javax.security.enterprise.SecurityContext;
 import javax.validation.Valid;
+import javax.ws.rs.ClientErrorException;
+import javax.ws.rs.ForbiddenException;
+import javax.ws.rs.InternalServerErrorException;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.prettytree.yarb.restprovider.api.UsersApi;
-import de.prettytree.yarb.restprovider.api.infrastructure.exceptionhandling.HttpResponseException;
 import de.prettytree.yarb.restprovider.api.model.User;
 import de.prettytree.yarb.restprovider.api.model.UserCredentials;
 import de.prettytree.yarb.restprovider.db.dao.UserDao;
@@ -50,11 +53,10 @@ public class UserApiImpl implements UsersApi {
 
 				userDao.save(newUser);
 			} catch (Throwable throwable) {
-				throw new HttpResponseException(throwable);
+				throw new InternalServerErrorException(throwable);
 			}
-			throw new HttpResponseException(Response.Status.CREATED);
 		} else {
-			throw new HttpResponseException(Response.Status.CONFLICT);
+			throw new ClientErrorException(Response.Status.CONFLICT);
 
 		}
 
@@ -69,10 +71,10 @@ public class UserApiImpl implements UsersApi {
 				return userMapper.map(dbUser.get());
 			}else {
 				LOG.error("Could not find user for AUTHORIZED user with id: " + userId);
-				throw new HttpResponseException(Response.Status.NOT_FOUND);
+				throw new NotFoundException();
 			}
 		}
-		throw new HttpResponseException(Response.Status.FORBIDDEN);
+		throw new ForbiddenException();
 	}
 
 }

@@ -57,7 +57,7 @@ public class TokenProvider {
 	
 	@Inject
 	@ConfigProperty(name = "de.prettytree.yarb.restprovider.jwt.expirationTimeMilliseconds", defaultValue = "3600000") //1000 * 60 * 60
-	Long expirationTime;
+	private Long expirationTime;
 
 	@PostConstruct
 	public void init() {

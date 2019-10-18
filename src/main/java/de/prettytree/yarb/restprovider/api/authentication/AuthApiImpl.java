@@ -5,11 +5,11 @@ import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.InternalServerErrorException;
+import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.core.Response;
 
 import de.prettytree.yarb.restprovider.api.AuthApi;
-import de.prettytree.yarb.restprovider.api.infrastructure.exceptionhandling.HttpResponseException;
 import de.prettytree.yarb.restprovider.api.infrastructure.security.TokenProvider;
 import de.prettytree.yarb.restprovider.api.model.LoginData;
 import de.prettytree.yarb.restprovider.api.model.UserCredentials;
@@ -38,7 +38,7 @@ public class AuthApiImpl implements AuthApi {
 			try {
 				hash = AuthUtils.hashPasswordWithSalt(userCredentials.getPassword(), user.get().getSalt());
 			} catch (HashException e) {
-				throw new HttpResponseException(Response.Status.INTERNAL_SERVER_ERROR);
+				throw new InternalServerErrorException(e);
 			}
 
 			if (Arrays.equals(user.get().getPassword(), hash)) {
@@ -49,7 +49,7 @@ public class AuthApiImpl implements AuthApi {
 			}
 
 		}
-		throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+		throw new NotAuthorizedException(Response.noContent().status(Response.Status.UNAUTHORIZED).build());
 	}
 
 }
