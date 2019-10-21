@@ -9,8 +9,8 @@ paths:
     post:
       summary: login
       responses:
-        '201':
-          description: Created
+        '200':
+          description: OK
           content:
             application/json:
               schema:
@@ -46,8 +46,6 @@ paths:
                 type: array
                 items:
                   $ref: ./models/board/board.v1.yaml
-        '201':
-          description: Created
         '401':
           description: Unauthorized
         '500':
@@ -68,8 +66,8 @@ paths:
     post:
       summary: createUser
       responses:
-        '201':
-          description: Created
+        '204':
+          description: No Content
           headers: {}
         '409':
           description: "Conflict: username already existing          \n"

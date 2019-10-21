@@ -24,7 +24,6 @@ import org.junit.runner.RunWith;
 import de.prettytree.yarb.restprovider.api.model.User;
 import de.prettytree.yarb.restprovider.api.model.UserCredentials;
 import de.prettytree.yarb.restprovider.api.user.AuthUtils;
-import de.prettytree.yarb.restprovider.api.user.UserApiImplTest;
 import de.prettytree.yarb.restprovider.db.model.DB_User;
 import de.prettytree.yarb.restprovider.test.TestUtils;
 
@@ -44,10 +43,7 @@ public class AuthApiImplTest {
 				.withTransitivity().asFile();
 
 		return ShrinkWrap.create(WebArchive.class, AuthApiImplTest.class.getSimpleName() + ".war")
-				.addPackages(true, "de.prettytree.yarb.restprovider.api")
-				.addPackages(true, "de.prettytree.yarb.restprovider.db")
-				.addPackages(true, "de.prettytree.yarb.restprovider.mapping")
-				.addPackages(true, "de.prettytree.yarb.restprovider.test")
+				.addPackages(true, "de.prettytree.yarb.restprovider")
 				.addAsResource("yarb-jwt.keystore")
 				.addAsResource("persistence.xml", "META-INF/persistence.xml")
 				.addAsWebInfResource(EmptyAsset.INSTANCE, ArchivePaths.create("beans.xml"))
@@ -92,9 +88,7 @@ public class AuthApiImplTest {
 		userCredentials.setPassword(password);
 		userCredentials.setUsername(userName);
 		User user = authApi.login(userCredentials).getUser();
-				
-		//TODO: mock tokenprovider
-		
+						
 		Assert.assertEquals(dbUser.getId().longValue(), user.getId().longValue());
 		Assert.assertEquals(dbUser.getUserName(), user.getUsername());
 	}

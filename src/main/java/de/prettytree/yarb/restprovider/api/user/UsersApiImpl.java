@@ -22,9 +22,9 @@ import de.prettytree.yarb.restprovider.db.dao.UserDao;
 import de.prettytree.yarb.restprovider.db.model.DB_User;
 import de.prettytree.yarb.restprovider.mapping.UserMapper;
 
-public class UserApiImpl implements UsersApi {
+public class UsersApiImpl implements UsersApi {
 
-	private static final Logger LOG = LoggerFactory.getLogger(UserApiImpl.class);
+	private static final Logger LOG = LoggerFactory.getLogger(UsersApiImpl.class);
 	private static final SecureRandom random = new SecureRandom();
 
 	@Inject

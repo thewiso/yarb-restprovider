@@ -1,11 +1,12 @@
 package de.prettytree.yarb.restprovider.api.user;
 
 import java.io.File;
+import java.net.URL;
 import java.util.Arrays;
 
-import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
@@ -13,7 +14,12 @@ import javax.ws.rs.ClientErrorException;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.test.api.ArquillianResource;
+import org.jboss.arquillian.test.spi.ArquillianProxyException;
 import org.jboss.arquillian.transaction.api.annotation.Transactional;
+import org.jboss.resteasy.client.jaxrs.ResteasyClient;
+import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.jboss.shrinkwrap.api.ArchivePaths;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
@@ -24,6 +30,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import de.prettytree.yarb.restprovider.api.UsersApi;
 import de.prettytree.yarb.restprovider.api.model.UserCredentials;
 import de.prettytree.yarb.restprovider.db.model.DB_User;
 import de.prettytree.yarb.restprovider.test.TestUtils;
@@ -33,31 +40,38 @@ import de.prettytree.yarb.restprovider.test.TestUtils;
 public class UserApiImplTest {
 	// http://arquillian.org/guides/getting_started/?utm_source=cta
 
-	@PersistenceContext
+	@PersistenceContext(name = "FOO")
 	private EntityManager em;
 
-	@Inject
-	private UserApiImpl userApi;
+	private UsersApi usersApi;
 
+	@ArquillianResource
+    private URL contextPath;
+	
 	@Deployment
 	public static WebArchive createDeployment() {
 		File[] files = Maven.resolver().loadPomFromFile("pom.xml").importRuntimeAndTestDependencies().resolve()
 				.withTransitivity().asFile();
 
 		return ShrinkWrap.create(WebArchive.class, UserApiImplTest.class.getSimpleName() + ".war")
-				.addPackages(true, "de.prettytree.yarb.restprovider.api")
-				.addPackages(true, "de.prettytree.yarb.restprovider.db")
-				.addPackages(true, "de.prettytree.yarb.restprovider.mapping")
-				.addPackages(true, "de.prettytree.yarb.restprovider.test")
+				.addPackages(true, "de.prettytree.yarb.restprovider")
 				.addAsResource("persistence.xml", "META-INF/persistence.xml")
-				.addAsWebInfResource(EmptyAsset.INSTANCE, ArchivePaths.create("beans.xml")).addAsLibraries(files);
+				.addAsResource("yarb-jwt.keystore")
+	            .addAsWebInfResource(new File("src/main/webapp/WEB-INF/web.xml"))
+	            .addAsWebInfResource(new File("src/main/webapp/WEB-INF/jboss-web.xml"))
+				.addAsWebInfResource(EmptyAsset.INSTANCE, ArchivePaths.create("beans.xml"))
+				.addAsLibraries(files);
 	}
 
 	@Before
 	public void clearTestEntityTable() {
 		TestUtils.truncateTable(em, DB_User.class);
-	}
 
+		ResteasyClient client = new ResteasyClientBuilder().build();
+        ResteasyWebTarget target = client.target(contextPath + "yarb");
+		usersApi = target.proxy(UsersApi.class);
+	}
+	
 	@Test
 	public void testCreateUserForExistingUser() throws Throwable {
 		String testUserName = "testuser1";
@@ -71,13 +85,23 @@ public class UserApiImplTest {
 		user.setUserName(testUserName);
 
 		em.persist(user);
-
+		em.createQuery("commit").executeUpdate();
+		
+		CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+		CriteriaQuery<DB_User> criteriaQuery = criteriaBuilder.createQuery(DB_User.class);
+		Root<DB_User> userRoot = criteriaQuery.from(DB_User.class);
+		criteriaQuery.select(userRoot).where(criteriaBuilder.equal(userRoot.get("userName"), testUserName));
+		TypedQuery<DB_User> query = em.createQuery(criteriaQuery);
+		user = query.getSingleResult();
+		
 		ClientErrorException ex = null;
 		try {
-			userApi.createUser(userCredentials);
-		} catch (ClientErrorException e) {
-			ex = e;
+			usersApi.createUser(userCredentials);
+		} catch (ArquillianProxyException e) {
+			ex = (ClientErrorException) e.getCause();
 		}
+		
+		Assert.assertNotNull(ex);
 		Assert.assertTrue("Wrong or no exception for creating existing user",
 				ex != null && ex.getResponse().getStatus() == 409);
 	}
@@ -91,7 +115,7 @@ public class UserApiImplTest {
 		userCredentials.setPassword(testPassword);
 		userCredentials.setUsername(testUserName);
 
-		userApi.createUser(userCredentials);
+		usersApi.createUser(userCredentials);
 
 		CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
 		CriteriaQuery<DB_User> criteriaQuery = criteriaBuilder.createQuery(DB_User.class);

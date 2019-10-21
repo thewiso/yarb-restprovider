@@ -41,7 +41,7 @@ public class UserCredentials   {
   
   @JsonProperty("password")
   @NotNull
- @Pattern(regexp="^[\\S]+$") @Size(min=6,max=20)  public String getPassword() {
+ @Size(min=6,max=20)  public String getPassword() {
     return password;
   }
   public void setPassword(String password) {
