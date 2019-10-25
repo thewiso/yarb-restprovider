@@ -24,7 +24,6 @@ import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -56,12 +55,6 @@ public class DaoTest {
 				.addAsWebInfResource(EmptyAsset.INSTANCE, ArchivePaths.create("beans.xml"))
 				.addAsLibraries(files);
 	}
-	
-	@Before
-	public void clearTestEntityTable() {
-		TestUtils.truncateTable(em, TestEntity.class);
-	}
-	
 
 	@Test
 	public void testSave() throws Throwable {

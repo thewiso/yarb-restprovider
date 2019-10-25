@@ -4,11 +4,10 @@ import java.io.File;
 import java.util.Optional;
 
 import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.persistence.UsingDataSet;
 import org.jboss.arquillian.transaction.api.annotation.Transactional;
 import org.jboss.shrinkwrap.api.ArchivePaths;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -16,7 +15,6 @@ import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -26,9 +24,6 @@ import de.prettytree.yarb.restprovider.test.TestUtils;
 @RunWith(Arquillian.class)
 @Transactional
 public class UserDaoTest {
-
-	@PersistenceContext
-	private EntityManager em;
 
 	@Inject
 	private UserDao dao;
@@ -45,26 +40,16 @@ public class UserDaoTest {
 				.addAsWebInfResource(EmptyAsset.INSTANCE, ArchivePaths.create("beans.xml")).addAsLibraries(files);
 	}
 
-	@Before
-	public void clearUserTable() {
-		TestUtils.truncateTable(em, DB_User.class);
-	}
-	
 	@Test
 	public void testFindByUsernameNoResult() {
 		Optional<DB_User> userOpt = dao.findByUserName(TestUtils.getRandomString10());
 		Assert.assertFalse(userOpt.isPresent());
 	}
 	
+	@UsingDataSet("datasets/users_mrfoo.xml")
 	@Test
 	public void testFindByUsernameOneResult() {
-		DB_User user = new DB_User();
-		user.setPassword(TestUtils.getRandomByteArray());
-		user.setSalt(TestUtils.getRandomByteArray());
-		user.setUserName(TestUtils.getRandomString10());
-		em.persist(user);
-		
-		Optional<DB_User> userOpt = dao.findByUserName(user.getUserName());
+		Optional<DB_User> userOpt = dao.findByUserName("mrfoo");
 		Assert.assertTrue(userOpt.isPresent());
 	}
 	

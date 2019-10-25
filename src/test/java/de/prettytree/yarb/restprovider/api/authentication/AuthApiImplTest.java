@@ -1,16 +1,19 @@
 package de.prettytree.yarb.restprovider.api.authentication;
 
 import java.io.File;
+import java.net.URL;
 
 import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.arquillian.transaction.api.annotation.Transactional;
+import org.jboss.arquillian.persistence.UsingDataSet;
+import org.jboss.arquillian.test.api.ArquillianResource;
+import org.jboss.resteasy.client.jaxrs.ResteasyClient;
+import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.jboss.shrinkwrap.api.ArchivePaths;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
@@ -21,21 +24,19 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import de.prettytree.yarb.restprovider.api.AuthApi;
 import de.prettytree.yarb.restprovider.api.model.User;
 import de.prettytree.yarb.restprovider.api.model.UserCredentials;
-import de.prettytree.yarb.restprovider.api.user.AuthUtils;
-import de.prettytree.yarb.restprovider.db.model.DB_User;
 import de.prettytree.yarb.restprovider.test.TestUtils;
 
 @RunWith(Arquillian.class)
-@Transactional
 public class AuthApiImplTest {
 
-	@PersistenceContext
-	private EntityManager em;
-
 	@Inject
-	private AuthApiImpl authApi;
+	private AuthApi authApi;
+
+	@ArquillianResource
+	private URL contextPath;
 
 	@Deployment
 	public static WebArchive createDeployment() {
@@ -43,53 +44,38 @@ public class AuthApiImplTest {
 				.withTransitivity().asFile();
 
 		return ShrinkWrap.create(WebArchive.class, AuthApiImplTest.class.getSimpleName() + ".war")
-				.addPackages(true, "de.prettytree.yarb.restprovider")
-				.addAsResource("yarb-jwt.keystore")
+				.addPackages(true, "de.prettytree.yarb.restprovider").addAsResource("yarb-jwt.keystore")
 				.addAsResource("persistence.xml", "META-INF/persistence.xml")
-				.addAsWebInfResource(EmptyAsset.INSTANCE, ArchivePaths.create("beans.xml"))
-				.addAsLibraries(files);
+				.addAsWebInfResource(EmptyAsset.INSTANCE, ArchivePaths.create("beans.xml")).addAsLibraries(files);
 	}
 
 	@Before
-	public void clearTestEntityTable() {
-		TestUtils.truncateTable(em, DB_User.class);
+	public void init() {
+		ResteasyClient client = new ResteasyClientBuilder().build();
+		ResteasyWebTarget target = client.target(contextPath + "yarb");
+
+		authApi = target.proxy(AuthApi.class);
 	}
 
-	@Test()
+	@Test
 	public void testLoginWithoutUser() {
-		WebApplicationException exception = null;
-		try {
-			UserCredentials userCredentials = new UserCredentials();
-			userCredentials.setPassword(TestUtils.getRandomString20());
-			userCredentials.setUsername(TestUtils.getRandomStringAlphabetic10().toLowerCase());
+		UserCredentials userCredentials = new UserCredentials();
+		userCredentials.setPassword(TestUtils.getRandomString20());
+		userCredentials.setUsername(TestUtils.getRandomStringAlphabetic10().toLowerCase());
+		WebApplicationException exception = TestUtils.assertThrowsException(() -> {
 			authApi.login(userCredentials);
-		} catch (WebApplicationException e) {
-			exception = e;
-		}
-		
-		Assert.assertNotNull(exception);
+		}, WebApplicationException.class);
+
 		Assert.assertEquals(exception.getResponse().getStatus(), Response.Status.UNAUTHORIZED.getStatusCode());
 	}
-	
-	@Test()
+
+	@UsingDataSet("datasets/users_mrfoo.xml")
+	@Test
 	public void testLoginWithUser() throws Throwable {
-		String userName = TestUtils.getRandomString10();
-		String password = TestUtils.getRandomString20();
-		byte[] salt = TestUtils.getRandomByteArray();
-		byte[] hashedPassword = AuthUtils.hashPasswordWithSalt(password, salt);
-		
-		DB_User dbUser = new DB_User();
-		dbUser.setUserName(userName);
-		dbUser.setPassword(hashedPassword);
-		dbUser.setSalt(salt);
-		em.persist(dbUser);
-		
-		UserCredentials userCredentials = new UserCredentials();
-		userCredentials.setPassword(password);
-		userCredentials.setUsername(userName);
+		UserCredentials userCredentials = TestUtils.getMrFooCredentials();
 		User user = authApi.login(userCredentials).getUser();
-						
-		Assert.assertEquals(dbUser.getId().longValue(), user.getId().longValue());
-		Assert.assertEquals(dbUser.getUserName(), user.getUsername());
+
+		Assert.assertEquals(1, user.getId().longValue());
+		Assert.assertEquals("mrfoo", user.getUsername());
 	}
 }
