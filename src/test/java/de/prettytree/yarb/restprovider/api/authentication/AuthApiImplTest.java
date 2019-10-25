@@ -5,7 +5,6 @@ import java.net.URL;
 
 import javax.inject.Inject;
 import javax.ws.rs.NotAuthorizedException;
-import javax.ws.rs.WebApplicationException;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -62,7 +61,7 @@ public class AuthApiImplTest {
 		UserCredentials userCredentials = new UserCredentials();
 		userCredentials.setPassword(TestUtils.getRandomString20());
 		userCredentials.setUsername(TestUtils.getRandomStringAlphabetic10().toLowerCase());
-		WebApplicationException exception = TestUtils.assertThrowsException(() -> {
+		TestUtils.assertThrowsException(() -> {
 			authApi.login(userCredentials);
 		}, NotAuthorizedException.class);
 	}
