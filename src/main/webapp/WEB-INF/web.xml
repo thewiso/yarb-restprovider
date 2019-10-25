@@ -13,6 +13,11 @@
 			<http-method-omission>OPTIONS</http-method-omission>
 			<http-method-omission>POST</http-method-omission>			
 		</web-resource-collection>
+		<web-resource-collection>
+			<web-resource-name>board api</web-resource-name>
+			<url-pattern>/yarb/boards/*</url-pattern>
+			<http-method-omission>OPTIONS</http-method-omission>		
+		</web-resource-collection>
 		<auth-constraint>
 			<role-name>user</role-name>
 		</auth-constraint>
