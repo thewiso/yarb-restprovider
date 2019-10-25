@@ -62,7 +62,6 @@ public class UsersApiImpl implements UsersApi {
 
 	}
 
-	//TODO: test
 	@Override
 	public User getUser(Integer userId) {
 		if(securityContext.getCallerPrincipal().getName().equals(userId.toString())) {

@@ -17,6 +17,7 @@ import javax.persistence.criteria.Root;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.persistence.Cleanup;
 import org.jboss.arquillian.transaction.api.annotation.Transactional;
 import org.jboss.shrinkwrap.api.ArchivePaths;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -32,6 +33,7 @@ import de.prettytree.yarb.restprovider.test.TestUtils;
 
 @RunWith(Arquillian.class)
 @Transactional
+@Cleanup
 public class DaoTest {
 
 	@PersistenceContext

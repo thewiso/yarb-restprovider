@@ -4,8 +4,8 @@ import java.io.File;
 import java.net.URL;
 
 import javax.inject.Inject;
+import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -64,9 +64,7 @@ public class AuthApiImplTest {
 		userCredentials.setUsername(TestUtils.getRandomStringAlphabetic10().toLowerCase());
 		WebApplicationException exception = TestUtils.assertThrowsException(() -> {
 			authApi.login(userCredentials);
-		}, WebApplicationException.class);
-
-		Assert.assertEquals(exception.getResponse().getStatus(), Response.Status.UNAUTHORIZED.getStatusCode());
+		}, NotAuthorizedException.class);
 	}
 
 	@UsingDataSet("datasets/users_mrfoo.xml")
