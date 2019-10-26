@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public class Board   {
   
   private @Valid Integer id;
-  private @Valid String userId;
+  private @Valid Integer userId;
   private @Valid String name;
   private @Valid OffsetDateTime creationDate;
 
@@ -37,7 +37,7 @@ public class Board   {
   /**
    * userId of the board owner
    **/
-  public Board userId(String userId) {
+  public Board userId(Integer userId) {
     this.userId = userId;
     return this;
   }
@@ -45,10 +45,10 @@ public class Board   {
   
   @JsonProperty("userId")
   @NotNull
-  public String getUserId() {
+  public Integer getUserId() {
     return userId;
   }
-  public void setUserId(String userId) {
+  public void setUserId(Integer userId) {
     this.userId = userId;
   }
 

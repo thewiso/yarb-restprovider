@@ -10,20 +10,20 @@
 		<configuration>
 			<!-- http://www.mastertheboss.com/jboss-frameworks/arquillian/arquillian-tutorial -->
 			<!-- the variable is defined in pom.xml -->
-			<property name="jbossHome">${JBOSS_DIR}</property>
-			<property name="javaHome">${JAVA_HOME}</property>
+			<property name="jbossHome">${arquillian.jbossdir}</property>
+			<property name="javaHome">${arquillian.javahome}</property>
+			<property name="javaVmArguments">-Xmx${arquillian.maxheap}</property>
 		</configuration>
 
 	</container>
 
 	<container qualifier="jbossDebug">
 		<configuration>
-			<property name="jbossHome">${JBOSS_DIR}</property>
-			<property name="javaVmArguments">-agentlib:jdwp=transport=dt_socket,address=8787,server=y,suspend=y</property>
-			<property name="javaHome">${JAVA_HOME}</property>
+			<property name="jbossHome">${arquillian.jbossdir}</property>
+			<property name="javaVmArguments">-agentlib:jdwp=transport=dt_socket,address=8787,server=y,suspend=y -Xmx${arquillian.maxheap}</property>
+			<property name="javaHome">${arquillian.javahome}</property>
 		</configuration>
 	</container>
-
 
 
 	<extension qualifier="persistence-dbunit">
@@ -31,7 +31,9 @@
 		<property name="excludePoi">true</property>
 	</extension>
 	<extension qualifier="persistence">
-		<property name="defaultCleanupPhase">BEFORE</property>
+		<property name="defaultCleanupUsingScriptPhase">AFTER</property>
+		<property name="defaultCleanupPhase">NONE</property>
+		<property name="defaultDataSeedStrategy">CLEAN_INSERT</property>
 	</extension>
 
 

@@ -1,6 +1,5 @@
 package de.prettytree.yarb.restprovider.db.dao;
 
-import java.io.File;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -17,13 +16,9 @@ import javax.persistence.criteria.Root;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.arquillian.persistence.Cleanup;
+import org.jboss.arquillian.persistence.CleanupUsingScript;
 import org.jboss.arquillian.transaction.api.annotation.Transactional;
-import org.jboss.shrinkwrap.api.ArchivePaths;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,7 +28,7 @@ import de.prettytree.yarb.restprovider.test.TestUtils;
 
 @RunWith(Arquillian.class)
 @Transactional
-@Cleanup
+@CleanupUsingScript(TestUtils.CLEANUP_DB_SCRIPT_PATH)
 public class DaoTest {
 
 	@PersistenceContext
@@ -44,18 +39,7 @@ public class DaoTest {
 
 	@Deployment
 	public static WebArchive createDeployment() {
-		File[] files = Maven.resolver().loadPomFromFile("pom.xml")
-				.importRuntimeAndTestDependencies()
-		        .resolve()
-		        .withTransitivity()
-		        .asFile();
-
-		return ShrinkWrap.create(WebArchive.class, DaoTest.class.getSimpleName() + ".war")
-				.addPackages(true, "de.prettytree.yarb.restprovider.db")
-				.addPackages(true, "de.prettytree.yarb.restprovider.test")
-				.addAsResource("persistence.xml", "META-INF/persistence.xml")
-				.addAsWebInfResource(EmptyAsset.INSTANCE, ArchivePaths.create("beans.xml"))
-				.addAsLibraries(files);
+		return TestUtils.createDefaultDeployment();
 	}
 
 	@Test

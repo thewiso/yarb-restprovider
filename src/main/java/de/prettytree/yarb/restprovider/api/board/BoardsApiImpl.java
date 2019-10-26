@@ -23,8 +23,6 @@ public class BoardsApiImpl implements BoardsApi {
 	@Inject
 	private BoardMapper boardMapper;
 
-	// TODO:
-	// https://stackoverflow.com/questions/18324017/how-to-set-eclipse-code-formatter-to-support-fluent-interfaces
 	// TODO: test
 	@Override
 	public List<Board> getBoards(Integer userId) {

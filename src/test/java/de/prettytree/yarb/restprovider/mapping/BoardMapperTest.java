@@ -26,6 +26,6 @@ public class BoardMapperTest {
 		Assert.assertEquals(dbBoard.getId().longValue(), board.getId().longValue());
 		Assert.assertEquals(dbBoard.getName(), board.getName());
 		Assert.assertEquals(dbBoard.getCreatedAt(), board.getCreationDate().toLocalDateTime());
-		Assert.assertEquals(dbBoard.getOwner().getId().longValue(), board.getUserId());
+		Assert.assertEquals(dbBoard.getOwner().getId().longValue(), board.getUserId().longValue());
 	}
 }

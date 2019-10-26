@@ -14,7 +14,6 @@ public class BoardDao extends Dao<DB_Board> {
 		super(DB_Board.class);
 	}
 	
-	//TODO: test
 	public List<DB_Board> findByUserId(long userId){
 		CriteriaQuery<DB_Board> criteriaQuery = criteriaBuilder.createQuery(DB_Board.class);
 		Root<DB_Board> boardRoot = criteriaQuery.from(DB_Board.class);

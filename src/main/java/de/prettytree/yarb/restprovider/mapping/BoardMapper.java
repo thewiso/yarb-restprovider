@@ -12,7 +12,7 @@ public class BoardMapper implements ModelMapper<DB_Board, Board> {
 	public Board map(DB_Board sourceModel) {
 		Board retVal = new Board();
 		
-		retVal.setUserId(sourceModel.getOwner().getId().intValue());//TODO: change yaml datatype
+		retVal.setUserId(sourceModel.getOwner().getId().intValue());
 		retVal.setCreationDate(OffsetDateTime.of(sourceModel.getCreatedAt(), ZoneOffset.UTC));
 		retVal.setId(sourceModel.getId().intValue());
 		retVal.setName(sourceModel.getName());

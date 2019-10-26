@@ -1,5 +1,6 @@
 package de.prettytree.yarb.restprovider.test;
 
+import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -7,10 +8,22 @@ import java.time.ZoneId;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.jboss.resteasy.client.jaxrs.ResteasyClient;
+import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+import org.jboss.shrinkwrap.api.ArchivePaths;
+import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.asset.EmptyAsset;
+import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 
+import de.prettytree.yarb.restprovider.api.board.BoardsApiImplTest;
+import de.prettytree.yarb.restprovider.api.infrastructure.ObjectMapperContextResolver;
 import de.prettytree.yarb.restprovider.api.model.UserCredentials;
 
 public class TestUtils {
+
+	public static final String DATA_SET_PATH = "datasets/testdata.xml";
+	public static final String CLEANUP_DB_SCRIPT_PATH = "scripts/truncate_db.sql";
 
 	public static LocalDateTime getRandomLocalDateTime() {
 		long timeStamp = ThreadLocalRandom.current().nextLong(-System.currentTimeMillis(), System.currentTimeMillis());
@@ -67,14 +80,37 @@ public class TestUtils {
 			throw new AssertionError(String.format("Expected exception %s but got %s", exceptionClass.getName(),
 					throwable.getClass().getName()), throwable);
 		}
-		
-		return (ExceptionType)throwable;
+
+		return (ExceptionType) throwable;
 	}
-	
-	public static UserCredentials getMrFooCredentials() {
+
+	public static UserCredentials getTestDataCredentials() {
 		UserCredentials retVal = new UserCredentials();
 		retVal.setUsername("mrfoo");
 		retVal.setPassword("foobar");
 		return retVal;
+	}
+
+	public static WebArchive createDefaultDeployment() {
+		File[] files = Maven.resolver()
+				.loadPomFromFile("pom.xml")
+				.importRuntimeAndTestDependencies()
+				.resolve()
+				.withTransitivity()
+				.asFile();
+
+		return ShrinkWrap.create(WebArchive.class, BoardsApiImplTest.class.getSimpleName() + ".war")
+				.addPackages(true, "de.prettytree.yarb.restprovider")
+				.addAsResource("persistence.xml", "META-INF/persistence.xml")
+				.addAsResource("yarb-jwt.keystore")
+				.addAsWebInfResource(new File("src/main/webapp/WEB-INF/web.xml"))
+				.addAsWebInfResource(new File("src/main/webapp/WEB-INF/jboss-web.xml"))
+				.addAsWebInfResource(new File("src/main/webapp/WEB-INF/jboss-deployment-structure.xml"))
+				.addAsWebInfResource(EmptyAsset.INSTANCE, ArchivePaths.create("beans.xml"))
+				.addAsLibraries(files);
+	}
+
+	public static ResteasyClient createDefaultResteasyClient() {
+		return new ResteasyClientBuilder().register(ObjectMapperContextResolver.class).build();
 	}
 }

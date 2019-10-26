@@ -1,6 +1,5 @@
 package de.prettytree.yarb.restprovider.api.authentication;
 
-import java.io.File;
 import java.net.URL;
 
 import javax.inject.Inject;
@@ -8,16 +7,12 @@ import javax.ws.rs.NotAuthorizedException;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.persistence.CleanupUsingScript;
 import org.jboss.arquillian.persistence.UsingDataSet;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
-import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
-import org.jboss.shrinkwrap.api.ArchivePaths;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,6 +24,7 @@ import de.prettytree.yarb.restprovider.api.model.UserCredentials;
 import de.prettytree.yarb.restprovider.test.TestUtils;
 
 @RunWith(Arquillian.class)
+@CleanupUsingScript(TestUtils.CLEANUP_DB_SCRIPT_PATH)
 public class AuthApiImplTest {
 
 	@Inject
@@ -39,18 +35,12 @@ public class AuthApiImplTest {
 
 	@Deployment
 	public static WebArchive createDeployment() {
-		File[] files = Maven.resolver().loadPomFromFile("pom.xml").importRuntimeAndTestDependencies().resolve()
-				.withTransitivity().asFile();
-
-		return ShrinkWrap.create(WebArchive.class, AuthApiImplTest.class.getSimpleName() + ".war")
-				.addPackages(true, "de.prettytree.yarb.restprovider").addAsResource("yarb-jwt.keystore")
-				.addAsResource("persistence.xml", "META-INF/persistence.xml")
-				.addAsWebInfResource(EmptyAsset.INSTANCE, ArchivePaths.create("beans.xml")).addAsLibraries(files);
+		return TestUtils.createDefaultDeployment();
 	}
 
 	@Before
 	public void init() {
-		ResteasyClient client = new ResteasyClientBuilder().build();
+		ResteasyClient client = TestUtils.createDefaultResteasyClient();
 		ResteasyWebTarget target = client.target(contextPath + "yarb");
 
 		authApi = target.proxy(AuthApi.class);
@@ -66,10 +56,10 @@ public class AuthApiImplTest {
 		}, NotAuthorizedException.class);
 	}
 
-	@UsingDataSet("datasets/users_mrfoo.xml")
+	@UsingDataSet(TestUtils.DATA_SET_PATH)
 	@Test
 	public void testLoginWithUser() throws Throwable {
-		UserCredentials userCredentials = TestUtils.getMrFooCredentials();
+		UserCredentials userCredentials = TestUtils.getTestDataCredentials();
 		User user = authApi.login(userCredentials).getUser();
 
 		Assert.assertEquals(1, user.getId().longValue());

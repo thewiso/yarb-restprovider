@@ -1,6 +1,6 @@
 package de.prettytree.yarb.restprovider.db.dao;
 
-import java.util.Optional;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -13,15 +13,15 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import de.prettytree.yarb.restprovider.db.model.DB_User;
+import de.prettytree.yarb.restprovider.db.model.DB_Board;
 import de.prettytree.yarb.restprovider.test.TestUtils;
 
 @RunWith(Arquillian.class)
 @CleanupUsingScript(TestUtils.CLEANUP_DB_SCRIPT_PATH)
-public class UserDaoTest {
+public class BoardDaoTest {
 
 	@Inject
-	private UserDao dao;
+	private BoardDao dao;
 
 	@Deployment
 	public static WebArchive createDeployment() {
@@ -29,16 +29,15 @@ public class UserDaoTest {
 	}
 
 	@Test
-	public void testFindByUsernameNoResult() {
-		Optional<DB_User> userOpt = dao.findByUserName(TestUtils.getRandomString10());
-		Assert.assertFalse(userOpt.isPresent());
+	public void testFindByIdWithoutResult() {
+		List<DB_Board> boardList = dao.findByUserId(1L);
+		Assert.assertEquals(0, boardList.size());
 	}
-	
+
 	@UsingDataSet(TestUtils.DATA_SET_PATH)
 	@Test
-	public void testFindByUsernameOneResult() {
-		Optional<DB_User> userOpt = dao.findByUserName("mrfoo");
-		Assert.assertTrue(userOpt.isPresent());
+	public void testFindByUsernameWithResult() {
+		List<DB_Board> boardList = dao.findByUserId(1L);
+		Assert.assertEquals(3, boardList.size());
 	}
-	
 }
