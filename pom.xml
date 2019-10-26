@@ -18,10 +18,10 @@
 		<arquillian.javahome>${JAVA_HOME}</arquillian.javahome>
 		<arquillian.maxheap>4096m</arquillian.maxheap>
 
-		<version.resteasy>3.7.0.Final</version.resteasy>
+		<version.resteasy>4.3.1.Final</version.resteasy>
 		<version.arquillian>1.5.0.Final</version.arquillian>
-		<version.slf4j>1.7.28</version.slf4j>
-		<version.jackson>2.9.9</version.jackson>
+		<version.slf4j>1.7.22</version.slf4j>
+		<version.jackson>2.9.10</version.jackson>
 	</properties>
 
 	<dependencies>
@@ -39,7 +39,7 @@
 		<dependency>
 			<groupId>org.jboss.resteasy</groupId>
 			<artifactId>resteasy-jaxrs</artifactId>
-			<version>${version.resteasy}</version>
+			<version>3.7.0.Final</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -90,7 +90,7 @@
 			<groupId>org.jboss.resteasy</groupId>
 			<artifactId>resteasy-client</artifactId>
 			<version>${version.resteasy}</version>
-			<scope>compile</scope>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.jboss.arquillian</groupId>

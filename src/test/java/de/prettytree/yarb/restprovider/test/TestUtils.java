@@ -7,9 +7,10 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.concurrent.ThreadLocalRandom;
 
+import javax.ws.rs.client.ClientBuilder;
+
 import org.apache.commons.lang3.RandomStringUtils;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
-import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.shrinkwrap.api.ArchivePaths;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
@@ -111,6 +112,6 @@ public class TestUtils {
 	}
 
 	public static ResteasyClient createDefaultResteasyClient() {
-		return new ResteasyClientBuilder().register(ObjectMapperContextResolver.class).build();
+		return (ResteasyClient) ClientBuilder.newClient().register(ObjectMapperContextResolver.class);
 	}
 }
