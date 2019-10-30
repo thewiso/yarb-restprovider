@@ -1,49 +1,64 @@
 package de.prettytree.yarb.restprovider.api.model;
 
-import javax.validation.constraints.*;
-import javax.validation.Valid;
-
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import org.openapitools.jackson.nullable.JsonNullable;
+import javax.validation.Valid;
+import javax.validation.constraints.*;
 
+/**
+ * User
+ */
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2019-10-29T07:51:26.217643+01:00[Europe/Berlin]")
 
 public class User   {
-  
-  private @Valid Integer id;
-  private @Valid String username;
+  @JsonProperty("id")
+  private Integer id;
 
-  /**
-   **/
+  @JsonProperty("username")
+  private String username;
+
   public User id(Integer id) {
     this.id = id;
     return this;
   }
 
-  
-  @JsonProperty("id")
+  /**
+   * Get id
+   * @return id
+  */
+  @ApiModelProperty(required = true, value = "")
   @NotNull
+
+
   public Integer getId() {
     return id;
   }
+
   public void setId(Integer id) {
     this.id = id;
   }
 
-  /**
-   **/
   public User username(String username) {
     this.username = username;
     return this;
   }
 
-  
-  @JsonProperty("username")
+  /**
+   * Get username
+   * @return username
+  */
+  @ApiModelProperty(required = true, value = "")
   @NotNull
- @Pattern(regexp="^[^\\sA-Z]+$") @Size(min=4,max=20)  public String getUsername() {
+
+@Pattern(regexp="^[^\\sA-Z]+$") @Size(min=4,max=20) 
+  public String getUsername() {
     return username;
   }
+
   public void setUsername(String username) {
     this.username = username;
   }

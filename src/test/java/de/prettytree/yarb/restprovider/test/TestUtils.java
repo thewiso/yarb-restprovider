@@ -1,30 +1,29 @@
 package de.prettytree.yarb.restprovider.test;
 
-import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.concurrent.ThreadLocalRandom;
 
-import javax.ws.rs.client.ClientBuilder;
-
 import org.apache.commons.lang3.RandomStringUtils;
-import org.jboss.resteasy.client.jaxrs.ResteasyClient;
-import org.jboss.shrinkwrap.api.ArchivePaths;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.jboss.shrinkwrap.resolver.api.maven.Maven;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.stereotype.Component;
 
-import de.prettytree.yarb.restprovider.api.board.BoardsApiImplTest;
-import de.prettytree.yarb.restprovider.api.infrastructure.ObjectMapperContextResolver;
 import de.prettytree.yarb.restprovider.api.model.UserCredentials;
 
+@Component
 public class TestUtils {
 
-	public static final String DATA_SET_PATH = "datasets/testdata.xml";
-	public static final String CLEANUP_DB_SCRIPT_PATH = "scripts/truncate_db.sql";
+	public static final String TEST_DATA_PATH = "classpath:scripts/testdata.sql";
+
+	public static final String LOGIN_PATH = "/auth/login";
+	public static final String CREATE_USER_PATH = "/users";
+	public static final String GET_USER_PATH = "/users/%d";
+
+	@Value("${server.servlet.context-path}")
+	private String contextPath;
 
 	public static LocalDateTime getRandomLocalDateTime() {
 		long timeStamp = ThreadLocalRandom.current().nextLong(-System.currentTimeMillis(), System.currentTimeMillis());
@@ -92,26 +91,13 @@ public class TestUtils {
 		return retVal;
 	}
 
-	public static WebArchive createDefaultDeployment() {
-		File[] files = Maven.resolver()
-				.loadPomFromFile("pom.xml")
-				.importRuntimeAndTestDependencies()
-				.resolve()
-				.withTransitivity()
-				.asFile();
-
-		return ShrinkWrap.create(WebArchive.class, BoardsApiImplTest.class.getSimpleName() + ".war")
-				.addPackages(true, "de.prettytree.yarb.restprovider")
-				.addAsResource("persistence.xml", "META-INF/persistence.xml")
-				.addAsResource("yarb-jwt.keystore")
-				.addAsWebInfResource(new File("src/main/webapp/WEB-INF/web.xml"))
-				.addAsWebInfResource(new File("src/main/webapp/WEB-INF/jboss-web.xml"))
-				.addAsWebInfResource(new File("src/main/webapp/WEB-INF/jboss-deployment-structure.xml"))
-				.addAsWebInfResource(EmptyAsset.INSTANCE, ArchivePaths.create("beans.xml"))
-				.addAsLibraries(files);
+	public String getRestURL(int port, String path) {
+		return "http://localhost:" + port + contextPath + path;
 	}
 
-	public static ResteasyClient createDefaultResteasyClient() {
-		return (ResteasyClient) ClientBuilder.newClient().register(ObjectMapperContextResolver.class);
+	public static HttpHeaders createAuthBearerHeader(String token) {
+		HttpHeaders retVal = new HttpHeaders();
+		retVal.add("Authorization", "Bearer " + token);
+		return retVal;
 	}
 }

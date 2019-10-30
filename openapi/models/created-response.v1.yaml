@@ -1,0 +1,5 @@
+title: created-response
+type: object
+properties:
+  id:
+    type: integer

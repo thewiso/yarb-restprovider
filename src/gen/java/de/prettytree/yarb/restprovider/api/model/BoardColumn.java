@@ -10,33 +10,55 @@ import javax.validation.Valid;
 import javax.validation.constraints.*;
 
 /**
- * InternalErrorMessage
+ * BoardColumn
  */
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2019-10-29T07:51:26.217643+01:00[Europe/Berlin]")
 
-public class InternalErrorMessage   {
-  @JsonProperty("exceptionId")
-  private String exceptionId;
+public class BoardColumn   {
+  @JsonProperty("id")
+  private Integer id;
 
-  public InternalErrorMessage exceptionId(String exceptionId) {
-    this.exceptionId = exceptionId;
+  @JsonProperty("name")
+  private String name;
+
+  public BoardColumn id(Integer id) {
+    this.id = id;
     return this;
   }
 
   /**
-   * Get exceptionId
-   * @return exceptionId
+   * Get id
+   * @return id
   */
-  @ApiModelProperty(required = true, value = "")
-  @NotNull
+  @ApiModelProperty(value = "")
 
 
-  public String getExceptionId() {
-    return exceptionId;
+  public Integer getId() {
+    return id;
   }
 
-  public void setExceptionId(String exceptionId) {
-    this.exceptionId = exceptionId;
+  public void setId(Integer id) {
+    this.id = id;
+  }
+
+  public BoardColumn name(String name) {
+    this.name = name;
+    return this;
+  }
+
+  /**
+   * Get name
+   * @return name
+  */
+  @ApiModelProperty(value = "")
+
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
   }
 
 
@@ -48,21 +70,23 @@ public class InternalErrorMessage   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    InternalErrorMessage internalErrorMessage = (InternalErrorMessage) o;
-    return Objects.equals(this.exceptionId, internalErrorMessage.exceptionId);
+    BoardColumn boardColumn = (BoardColumn) o;
+    return Objects.equals(this.id, boardColumn.id) &&
+        Objects.equals(this.name, boardColumn.name);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(exceptionId);
+    return Objects.hash(id, name);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class InternalErrorMessage {\n");
+    sb.append("class BoardColumn {\n");
     
-    sb.append("    exceptionId: ").append(toIndentedString(exceptionId)).append("\n");
+    sb.append("    id: ").append(toIndentedString(id)).append("\n");
+    sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("}");
     return sb.toString();
   }

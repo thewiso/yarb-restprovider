@@ -10,33 +10,32 @@ import javax.validation.Valid;
 import javax.validation.constraints.*;
 
 /**
- * InternalErrorMessage
+ * CreatedResponse
  */
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2019-10-29T07:51:26.217643+01:00[Europe/Berlin]")
 
-public class InternalErrorMessage   {
-  @JsonProperty("exceptionId")
-  private String exceptionId;
+public class CreatedResponse   {
+  @JsonProperty("id")
+  private Integer id;
 
-  public InternalErrorMessage exceptionId(String exceptionId) {
-    this.exceptionId = exceptionId;
+  public CreatedResponse id(Integer id) {
+    this.id = id;
     return this;
   }
 
   /**
-   * Get exceptionId
-   * @return exceptionId
+   * Get id
+   * @return id
   */
-  @ApiModelProperty(required = true, value = "")
-  @NotNull
+  @ApiModelProperty(value = "")
 
 
-  public String getExceptionId() {
-    return exceptionId;
+  public Integer getId() {
+    return id;
   }
 
-  public void setExceptionId(String exceptionId) {
-    this.exceptionId = exceptionId;
+  public void setId(Integer id) {
+    this.id = id;
   }
 
 
@@ -48,21 +47,21 @@ public class InternalErrorMessage   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    InternalErrorMessage internalErrorMessage = (InternalErrorMessage) o;
-    return Objects.equals(this.exceptionId, internalErrorMessage.exceptionId);
+    CreatedResponse createdResponse = (CreatedResponse) o;
+    return Objects.equals(this.id, createdResponse.id);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(exceptionId);
+    return Objects.hash(id);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class InternalErrorMessage {\n");
+    sb.append("class CreatedResponse {\n");
     
-    sb.append("    exceptionId: ").append(toIndentedString(exceptionId)).append("\n");
+    sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("}");
     return sb.toString();
   }

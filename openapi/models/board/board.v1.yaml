@@ -1,0 +1,21 @@
+title: board
+type: object
+properties:
+  id:
+    type: integer
+  name:
+    type: string
+  creationDate:
+    type: string
+    format: date-time
+  columns:
+    type: array
+    maxItems: 5
+    minItems: 2
+    items:
+      $ref: ./board-column.v1.yaml
+required:
+  - id
+  - name
+  - creationDate
+  - columns

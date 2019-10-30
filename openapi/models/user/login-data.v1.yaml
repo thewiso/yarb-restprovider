@@ -1,0 +1,11 @@
+title: login-data
+type: object
+description: ''
+properties:
+  token:
+    type: string
+  user:
+    $ref: ./user.v1.yaml
+required:
+  - token
+  - user

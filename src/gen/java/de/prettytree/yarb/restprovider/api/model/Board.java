@@ -1,89 +1,126 @@
 package de.prettytree.yarb.restprovider.api.model;
 
-import java.time.OffsetDateTime;
-import javax.validation.constraints.*;
-import javax.validation.Valid;
-
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
+import de.prettytree.yarb.restprovider.api.model.BoardColumn;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import org.openapitools.jackson.nullable.JsonNullable;
+import javax.validation.Valid;
+import javax.validation.constraints.*;
 
+/**
+ * Board
+ */
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2019-10-29T07:51:26.217643+01:00[Europe/Berlin]")
 
 public class Board   {
-  
-  private @Valid Integer id;
-  private @Valid Integer userId;
-  private @Valid String name;
-  private @Valid OffsetDateTime creationDate;
+  @JsonProperty("id")
+  private Integer id;
 
-  /**
-   **/
+  @JsonProperty("name")
+  private String name;
+
+  @JsonProperty("creationDate")
+  private OffsetDateTime creationDate;
+
+  @JsonProperty("columns")
+  @Valid
+  private List<BoardColumn> columns = new ArrayList<>();
+
   public Board id(Integer id) {
     this.id = id;
     return this;
   }
 
-  
-  @JsonProperty("id")
+  /**
+   * Get id
+   * @return id
+  */
+  @ApiModelProperty(required = true, value = "")
   @NotNull
+
+
   public Integer getId() {
     return id;
   }
+
   public void setId(Integer id) {
     this.id = id;
   }
 
-  /**
-   * userId of the board owner
-   **/
-  public Board userId(Integer userId) {
-    this.userId = userId;
-    return this;
-  }
-
-  
-  @JsonProperty("userId")
-  @NotNull
-  public Integer getUserId() {
-    return userId;
-  }
-  public void setUserId(Integer userId) {
-    this.userId = userId;
-  }
-
-  /**
-   **/
   public Board name(String name) {
     this.name = name;
     return this;
   }
 
-  
-  @JsonProperty("name")
+  /**
+   * Get name
+   * @return name
+  */
+  @ApiModelProperty(required = true, value = "")
   @NotNull
+
+
   public String getName() {
     return name;
   }
+
   public void setName(String name) {
     this.name = name;
   }
 
-  /**
-   **/
   public Board creationDate(OffsetDateTime creationDate) {
     this.creationDate = creationDate;
     return this;
   }
 
-  
-  @JsonProperty("creationDate")
+  /**
+   * Get creationDate
+   * @return creationDate
+  */
+  @ApiModelProperty(required = true, value = "")
   @NotNull
+
+  @Valid
+
   public OffsetDateTime getCreationDate() {
     return creationDate;
   }
+
   public void setCreationDate(OffsetDateTime creationDate) {
     this.creationDate = creationDate;
+  }
+
+  public Board columns(List<BoardColumn> columns) {
+    this.columns = columns;
+    return this;
+  }
+
+  public Board addColumnsItem(BoardColumn columnsItem) {
+    this.columns.add(columnsItem);
+    return this;
+  }
+
+  /**
+   * Get columns
+   * @return columns
+  */
+  @ApiModelProperty(required = true, value = "")
+  @NotNull
+
+  @Valid
+@Size(min=2,max=5) 
+  public List<BoardColumn> getColumns() {
+    return columns;
+  }
+
+  public void setColumns(List<BoardColumn> columns) {
+    this.columns = columns;
   }
 
 
@@ -97,14 +134,14 @@ public class Board   {
     }
     Board board = (Board) o;
     return Objects.equals(this.id, board.id) &&
-        Objects.equals(this.userId, board.userId) &&
         Objects.equals(this.name, board.name) &&
-        Objects.equals(this.creationDate, board.creationDate);
+        Objects.equals(this.creationDate, board.creationDate) &&
+        Objects.equals(this.columns, board.columns);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, userId, name, creationDate);
+    return Objects.hash(id, name, creationDate, columns);
   }
 
   @Override
@@ -113,9 +150,9 @@ public class Board   {
     sb.append("class Board {\n");
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
-    sb.append("    userId: ").append(toIndentedString(userId)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    creationDate: ").append(toIndentedString(creationDate)).append("\n");
+    sb.append("    columns: ").append(toIndentedString(columns)).append("\n");
     sb.append("}");
     return sb.toString();
   }

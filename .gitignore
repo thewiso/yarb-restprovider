@@ -1,9 +1,19 @@
+HELP.md
 target/
-.settings/
-.classpath
-.project
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**
+!**/src/test/**
 
-*.jdbc
-*.sql
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
 *.keystore
-*.launch
+*.db
+/createDDL.sql
+/dropDDL.sql

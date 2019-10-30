@@ -6,9 +6,10 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.annotation.PostConstruct;
-import javax.enterprise.context.ApplicationScoped;
 
-@ApplicationScoped
+import org.springframework.stereotype.Component;
+
+@Component
 class ExceptionCounter {
 
 	private static final int RANDOM_LENGTH = 6;

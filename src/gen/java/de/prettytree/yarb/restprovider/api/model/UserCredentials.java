@@ -1,49 +1,64 @@
 package de.prettytree.yarb.restprovider.api.model;
 
-import javax.validation.constraints.*;
-import javax.validation.Valid;
-
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import org.openapitools.jackson.nullable.JsonNullable;
+import javax.validation.Valid;
+import javax.validation.constraints.*;
 
+/**
+ * UserCredentials
+ */
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2019-10-29T07:51:26.217643+01:00[Europe/Berlin]")
 
 public class UserCredentials   {
-  
-  private @Valid String username;
-  private @Valid String password;
+  @JsonProperty("username")
+  private String username;
 
-  /**
-   **/
+  @JsonProperty("password")
+  private String password;
+
   public UserCredentials username(String username) {
     this.username = username;
     return this;
   }
 
-  
-  @JsonProperty("username")
+  /**
+   * Get username
+   * @return username
+  */
+  @ApiModelProperty(required = true, value = "")
   @NotNull
- @Pattern(regexp="^[^\\sA-Z]+$") @Size(min=4,max=20)  public String getUsername() {
+
+@Pattern(regexp="^[^\\sA-Z]+$") @Size(min=4,max=20) 
+  public String getUsername() {
     return username;
   }
+
   public void setUsername(String username) {
     this.username = username;
   }
 
-  /**
-   **/
   public UserCredentials password(String password) {
     this.password = password;
     return this;
   }
 
-  
-  @JsonProperty("password")
+  /**
+   * Get password
+   * @return password
+  */
+  @ApiModelProperty(required = true, value = "")
   @NotNull
- @Size(min=6,max=20)  public String getPassword() {
+
+@Size(min=6,max=20) 
+  public String getPassword() {
     return password;
   }
+
   public void setPassword(String password) {
     this.password = password;
   }

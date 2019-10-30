@@ -1,0 +1,7 @@
+title: internal-error-message
+type: object
+properties:
+  exceptionId:
+    type: string
+required:
+  - exceptionId

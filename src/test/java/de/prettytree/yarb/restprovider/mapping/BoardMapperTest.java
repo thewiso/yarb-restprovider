@@ -1,7 +1,7 @@
 package de.prettytree.yarb.restprovider.mapping;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import de.prettytree.yarb.restprovider.api.model.Board;
 import de.prettytree.yarb.restprovider.db.model.DB_Board;
@@ -21,11 +21,10 @@ public class BoardMapperTest {
 		dbBoard.setCreatedAt(TestUtils.getRandomLocalDateTime());
 		dbBoard.setOwner(dbUser);
 		
-		Board board = new BoardMapper().map(dbBoard);
+		Board board = BoardMapper.map(dbBoard);
 		
-		Assert.assertEquals(dbBoard.getId().longValue(), board.getId().longValue());
-		Assert.assertEquals(dbBoard.getName(), board.getName());
-		Assert.assertEquals(dbBoard.getCreatedAt(), board.getCreationDate().toLocalDateTime());
-		Assert.assertEquals(dbBoard.getOwner().getId().longValue(), board.getUserId().longValue());
+		Assertions.assertEquals(dbBoard.getId().longValue(), board.getId().longValue());
+		Assertions.assertEquals(dbBoard.getName(), board.getName());
+		Assertions.assertEquals(dbBoard.getCreatedAt(), board.getCreationDate().toLocalDateTime());
 	}
 }

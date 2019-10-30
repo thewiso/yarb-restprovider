@@ -1,68 +1,60 @@
 package de.prettytree.yarb.restprovider.api.authentication;
 
-import java.net.URL;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
 
-import javax.inject.Inject;
-import javax.ws.rs.NotAuthorizedException;
-
-import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.arquillian.persistence.CleanupUsingScript;
-import org.jboss.arquillian.persistence.UsingDataSet;
-import org.jboss.arquillian.test.api.ArquillianResource;
-import org.jboss.resteasy.client.jaxrs.ResteasyClient;
-import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import de.prettytree.yarb.restprovider.api.AuthApi;
+import de.prettytree.yarb.restprovider.api.model.LoginData;
 import de.prettytree.yarb.restprovider.api.model.User;
 import de.prettytree.yarb.restprovider.api.model.UserCredentials;
 import de.prettytree.yarb.restprovider.test.TestUtils;
 
-@RunWith(Arquillian.class)
-@CleanupUsingScript(TestUtils.CLEANUP_DB_SCRIPT_PATH)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
+@ActiveProfiles("test")
 public class AuthApiImplTest {
 
-	@Inject
-	private AuthApi authApi;
+	@LocalServerPort
+	private int port;
 
-	@ArquillianResource
-	private URL contextPath;
+	@Autowired
+	private TestUtils testUtils;
 
-	@Deployment
-	public static WebArchive createDeployment() {
-		return TestUtils.createDefaultDeployment();
-	}
-
-	@Before
-	public void init() {
-		ResteasyClient client = TestUtils.createDefaultResteasyClient();
-		ResteasyWebTarget target = client.target(contextPath + "yarb");
-
-		authApi = target.proxy(AuthApi.class);
-	}
+	@Autowired
+	private TestRestTemplate restTemplate;
 
 	@Test
 	public void testLoginWithoutUser() {
 		UserCredentials userCredentials = new UserCredentials();
 		userCredentials.setPassword(TestUtils.getRandomString20());
 		userCredentials.setUsername(TestUtils.getRandomStringAlphabetic10().toLowerCase());
-		TestUtils.assertThrowsException(() -> {
-			authApi.login(userCredentials);
-		}, NotAuthorizedException.class);
+
+		Assertions.assertEquals(HttpStatus.UNAUTHORIZED,
+				restTemplate
+						.postForEntity(testUtils.getRestURL(port, TestUtils.LOGIN_PATH), userCredentials,
+								LoginData.class)
+						.getStatusCode());
 	}
 
-	@UsingDataSet(TestUtils.DATA_SET_PATH)
+	@Sql(scripts = { TestUtils.TEST_DATA_PATH })
 	@Test
 	public void testLoginWithUser() throws Throwable {
 		UserCredentials userCredentials = TestUtils.getTestDataCredentials();
-		User user = authApi.login(userCredentials).getUser();
+		User user = restTemplate
+				.postForEntity(testUtils.getRestURL(port, TestUtils.LOGIN_PATH), userCredentials, LoginData.class)
+				.getBody()
+				.getUser();
 
-		Assert.assertEquals(1, user.getId().longValue());
-		Assert.assertEquals("mrfoo", user.getUsername());
+		Assertions.assertEquals(1, user.getId().longValue());
+		Assertions.assertEquals("mrfoo", user.getUsername());
 	}
 }

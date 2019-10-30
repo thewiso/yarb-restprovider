@@ -1,80 +1,58 @@
 package de.prettytree.yarb.restprovider.api.user;
 
-import java.io.IOException;
-import java.net.URL;
 import java.util.Arrays;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
-import javax.ws.rs.ClientErrorException;
-import javax.ws.rs.ForbiddenException;
-import javax.ws.rs.NotAuthorizedException;
-import javax.ws.rs.client.ClientRequestContext;
-import javax.ws.rs.client.ClientRequestFilter;
-import javax.ws.rs.core.HttpHeaders;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
 
-import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.arquillian.persistence.CleanupUsingScript;
-import org.jboss.arquillian.persistence.UsingDataSet;
-import org.jboss.arquillian.test.api.ArquillianResource;
-import org.jboss.resteasy.client.jaxrs.ResteasyClient;
-import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import de.prettytree.yarb.restprovider.api.AuthApi;
-import de.prettytree.yarb.restprovider.api.UsersApi;
 import de.prettytree.yarb.restprovider.api.model.LoginData;
 import de.prettytree.yarb.restprovider.api.model.User;
 import de.prettytree.yarb.restprovider.api.model.UserCredentials;
+import de.prettytree.yarb.restprovider.db.dao.UserDao;
 import de.prettytree.yarb.restprovider.db.model.DB_User;
 import de.prettytree.yarb.restprovider.test.TestUtils;
 
-@RunWith(Arquillian.class)
-@CleanupUsingScript(TestUtils.CLEANUP_DB_SCRIPT_PATH)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
+@ActiveProfiles("test")
 public class UserApiImplTest {
 
-	@PersistenceContext
-	private EntityManager em;
+	@Autowired
+	UserDao userDao;
 
-	private UsersApi usersApi;
-	private AuthApi authApi;
-	private ResteasyWebTarget target;
+	@LocalServerPort
+	private int port;
 
-	@ArquillianResource
-	private URL contextPath;
+	@Autowired
+	private TestUtils testUtils;
 
-	@Deployment
-	public static WebArchive createDeployment() {
-		return TestUtils.createDefaultDeployment();
-	}
+	@Autowired
+	private TestRestTemplate restTemplate;
 
-	@Before
-	public void init() {
-		ResteasyClient client = TestUtils.createDefaultResteasyClient();
-		target = client.target(contextPath + "yarb");
-
-		authApi = target.proxy(AuthApi.class);
-		usersApi = target.proxy(UsersApi.class);
-	}
-
-	@UsingDataSet(TestUtils.DATA_SET_PATH)
 	@Test
+	@Sql(scripts = { TestUtils.TEST_DATA_PATH })
 	public void testCreateUserForExistingUser() throws Throwable {
-		ClientErrorException ex = TestUtils.assertThrowsException(() -> {
-			usersApi.createUser(TestUtils.getTestDataCredentials());
-		}, ClientErrorException.class);
+		UserCredentials userCredentials = TestUtils.getTestDataCredentials();
 
-		Assert.assertNotNull(ex);
-		Assert.assertTrue("Wrong or no exception for creating existing user",
-				ex != null && ex.getResponse().getStatus() == 409);
+		ResponseEntity<String> response = restTemplate
+				.postForEntity(testUtils.getRestURL(port, TestUtils.CREATE_USER_PATH), userCredentials, String.class);
+
+		Assertions.assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
 	}
 
 	@Test
@@ -86,61 +64,56 @@ public class UserApiImplTest {
 		userCredentials.setPassword(testPassword);
 		userCredentials.setUsername(testUserName);
 
-		usersApi.createUser(userCredentials);
+		restTemplate.postForEntity(testUtils.getRestURL(port, TestUtils.CREATE_USER_PATH), userCredentials,
+				String.class);
 
-		CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
-		CriteriaQuery<DB_User> criteriaQuery = criteriaBuilder.createQuery(DB_User.class);
-		Root<DB_User> userRoot = criteriaQuery.from(DB_User.class);
-		criteriaQuery.select(userRoot).where(criteriaBuilder.equal(userRoot.get("userName"), testUserName));
-		DB_User dbUser = em.createQuery(criteriaQuery).getSingleResult();
-
+		DB_User dbUser = userDao.findByUserName(testUserName).get();
 		byte[] hashedPassword = AuthUtils.hashPasswordWithSalt(testPassword, dbUser.getSalt());
 
-		Assert.assertTrue("Password not persisted correctly", Arrays.equals(hashedPassword, dbUser.getPassword()));
+		Assertions.assertTrue(Arrays.equals(hashedPassword, dbUser.getPassword()));
 	}
 
 	@Test
-	@UsingDataSet(TestUtils.DATA_SET_PATH)
+	@Sql(scripts = { TestUtils.TEST_DATA_PATH })
 	public void testGetUsersSuccess() {
 		UserCredentials credentials = TestUtils.getTestDataCredentials();
-		LoginData loginData = authApi.login(credentials);
+		LoginData loginData = restTemplate
+				.postForEntity(testUtils.getRestURL(port, TestUtils.LOGIN_PATH), credentials, LoginData.class)
+				.getBody();
 
-		UsersApi authorizedUsersApi = target.register(new ClientRequestFilter() {
+		HttpEntity<HttpHeaders> authHeader = new HttpEntity<>(TestUtils.createAuthBearerHeader(loginData.getToken()));
 
-			@Override
-			public void filter(ClientRequestContext requestContext) throws IOException {
-				requestContext.getHeaders().add(HttpHeaders.AUTHORIZATION, "Bearer: " + loginData.getToken());
-			}
-		}).proxy(UsersApi.class);
+		User user = restTemplate
+				.exchange(
+						testUtils.getRestURL(port, String.format(TestUtils.GET_USER_PATH, loginData.getUser().getId())),
+						HttpMethod.GET, authHeader, User.class)
+				.getBody();
 
-		User user = authorizedUsersApi.getUser(loginData.getUser().getId());
-		Assert.assertEquals(credentials.getUsername(), user.getUsername());
+		Assertions.assertEquals(credentials.getUsername(), user.getUsername());
 	}
 
 	@Test
+	@Sql(scripts = { TestUtils.TEST_DATA_PATH })
 	public void testGetUsersAuthorisationException() throws Throwable {
-		TestUtils.assertThrowsException(() -> {
-			usersApi.getUser(42);
-		}, NotAuthorizedException.class);
+		ResponseEntity<User> response = restTemplate
+				.getForEntity(testUtils.getRestURL(port, String.format(TestUtils.GET_USER_PATH, 42)), User.class);
+		Assertions.assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
 	}
 
 	@Test
-	@UsingDataSet(TestUtils.DATA_SET_PATH)
+	@Sql(scripts = { TestUtils.TEST_DATA_PATH })
 	public void testGetUsersForbiddenException() throws Throwable {
-		AuthApi authApi = target.proxy(AuthApi.class);
-		LoginData loginData = authApi.login(TestUtils.getTestDataCredentials());
+		UserCredentials credentials = TestUtils.getTestDataCredentials();
+		LoginData loginData = restTemplate
+				.postForEntity(testUtils.getRestURL(port, TestUtils.LOGIN_PATH), credentials, LoginData.class)
+				.getBody();
 
-		UsersApi authorisedUsersApi = target.register(new ClientRequestFilter() {
+		HttpEntity<HttpHeaders> authHeader = new HttpEntity<>(TestUtils.createAuthBearerHeader(loginData.getToken()));
+		ResponseEntity<User> response = restTemplate.exchange(
+				testUtils.getRestURL(port, String.format(TestUtils.GET_USER_PATH, loginData.getUser().getId() + 1)),
+				HttpMethod.GET, authHeader, User.class);
 
-			@Override
-			public void filter(ClientRequestContext requestContext) throws IOException {
-				requestContext.getHeaders().add(HttpHeaders.AUTHORIZATION, "Bearer: " + loginData.getToken());
-			}
-		}).proxy(UsersApi.class);
-
-		TestUtils.assertThrowsException(() -> {
-			authorisedUsersApi.getUser(loginData.getUser().getId() + 1);
-		}, ForbiddenException.class);
+		Assertions.assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
 	}
 
 }

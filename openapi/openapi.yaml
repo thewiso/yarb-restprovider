@@ -48,6 +48,8 @@ paths:
                   $ref: ./models/board/board.v1.yaml
         '401':
           description: Unauthorized
+        '403':
+          description: Forbidden
         '500':
           description: Internal Server Error
           content:
@@ -61,14 +63,35 @@ paths:
             type: integer
           in: query
           name: userId
+          required: true
       operationId: getBoards
+      description: Get boards by owner
+    post:
+      summary: createBoard
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: ./models/created-response.v1.yaml
+        '401':
+          description: Unauthorized
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: ./models/board/create-board.v1.yaml
+      description: Create new board
+      operationId: createBoard
   /users:
     post:
       summary: createUser
       responses:
         '204':
           description: No Content
-          headers: {}
         '409':
           description: "Conflict: username already existing          \n"
         '500':

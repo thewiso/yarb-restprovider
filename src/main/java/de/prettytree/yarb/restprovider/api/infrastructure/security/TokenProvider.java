@@ -9,22 +9,18 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.annotation.PostConstruct;
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import de.prettytree.yarb.restprovider.YARBRestProvider;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
-@ApplicationScoped
+@Component
 public class TokenProvider {
 
 	private static final Logger LOG = LoggerFactory.getLogger(TokenProvider.class);
@@ -35,40 +31,26 @@ public class TokenProvider {
 	static {
 		// https://www.eclipse.org/community/eclipse_newsletter/2017/september/article2.php
 		JWT_STATIC_CLAIMS.put("iss", "YARB Restprovider");
-		JWT_STATIC_CLAIMS.put("groups", Arrays.asList(YARBRestProvider.USER_GROUP));
+		JWT_STATIC_CLAIMS.put("groups", Arrays.asList("user"));
 
 		JWT_STATIC_HEADERS.put("typ", "JWT");
 		JWT_STATIC_HEADERS.put("alg", "RS256");
 	}
 
 	private PrivateKey privateKey;
+	private TokenConfiguration tokenConfiguration;
 
-	@Inject
-	@ConfigProperty(name = "de.prettytree.yarb.restprovider.jwt.keyStorePath", defaultValue = "yarb-jwt.keystore")
-	private String keyStorePath;
-
-	@Inject
-	@ConfigProperty(name = "de.prettytree.yarb.restprovider.jwt.keyStoreEntryName", defaultValue = "yarp jwt")
-	private String jwtKeyStoreEntryName;
-	
-	@Inject
-	@ConfigProperty(name = "de.prettytree.yarb.restprovider.jwt.keyStorePassword", defaultValue = "")
-	private String jwtKeyStorePassword;
-	
-	@Inject
-	@ConfigProperty(name = "de.prettytree.yarb.restprovider.jwt.expirationTimeMilliseconds", defaultValue = "3600000") //1000 * 60 * 60
-	private Long expirationTime;
-
-	@PostConstruct
-	public void init() {
+	@Autowired
+	public TokenProvider(TokenConfiguration tokenConfiguration) {
+		this.tokenConfiguration = tokenConfiguration;
 		try {
-			InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(keyStorePath);
+			InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(tokenConfiguration.getKeyStorePath());
 			KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
 			ks.load(inputStream, null);
 			inputStream.close();
 
-			KeyStore.ProtectionParameter protParam = new KeyStore.PasswordProtection("".toCharArray());
-			KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) ks.getEntry(jwtKeyStoreEntryName, protParam);
+			KeyStore.ProtectionParameter protParam = new KeyStore.PasswordProtection(tokenConfiguration.getKeyStorePassword().toCharArray());
+			KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) ks.getEntry(tokenConfiguration.getKeyStoreEntryName(), protParam);
 			privateKey = privateKeyEntry.getPrivateKey();
 		} catch (Exception e) {
 			throw new RuntimeException("Could not load private key", e);
@@ -78,22 +60,20 @@ public class TokenProvider {
 	public String createToken(long userId) {
 		// https://github.com/jwtk/jjwt
 		// https://en.wikipedia.org/wiki/PKCS_8
-		// https://github.com/MicroProfileJWT/eclipse-newsletter-sep-2017				
-        JwtBuilder builder = Jwts.builder()
-        		.setHeader(JWT_STATIC_HEADERS)
-        		.setClaims(JWT_STATIC_CLAIMS)
-        		.setSubject(String.valueOf(userId))
-        		.setId(UUID.randomUUID().toString())
-        		.setIssuedAt(new Date())
-        		.setExpiration(new Date((System.currentTimeMillis() + expirationTime)));
+		// https://github.com/MicroProfileJWT/eclipse-newsletter-sep-2017
+		JwtBuilder builder = Jwts.builder()
+				.setHeader(JWT_STATIC_HEADERS)
+				.setClaims(JWT_STATIC_CLAIMS)
+				.setSubject(String.valueOf(userId))
+				.setId(UUID.randomUUID().toString())
+				.setIssuedAt(new Date())
+				.setExpiration(new Date((System.currentTimeMillis() + tokenConfiguration.getTokenExpirationTimeMillis())));
 
-        if(LOG.isTraceEnabled()) {
-        	LOG.trace("Created token: {}", builder.compact());
-        }
-        
-        return builder
-        		.signWith(privateKey, SignatureAlgorithm.RS256)
-        		.compact();
+		if (LOG.isTraceEnabled()) {
+			LOG.trace("Created token: {}", builder.compact());
+		}
+
+		return builder.signWith(privateKey, SignatureAlgorithm.RS256).compact();
 	}
 
 	/**
