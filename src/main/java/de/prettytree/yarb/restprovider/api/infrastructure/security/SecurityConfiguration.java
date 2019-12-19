@@ -16,27 +16,41 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
-	//https://dev.to/keysh/spring-security-with-jwt-3j76
+	// https://dev.to/keysh/spring-security-with-jwt-3j76
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.cors()
-				.and().csrf()
-				.disable().authorizeRequests()
-				.antMatchers(HttpMethod.POST , "/users").permitAll()
-				.antMatchers("/auth/**").permitAll()
-				.anyRequest().authenticated()
-				.and().addFilter(new JwtAuthenticationFilter(authenticationManager(), getApplicationContext()))
-				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-				.and().exceptionHandling().authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
-		
-		//TODO: /yarb/boards/* 
-		//TODO: /yarb/users/*
+				.and()
+				.csrf()
+				.disable()
+				.authorizeRequests()
+				.antMatchers(HttpMethod.POST, "/users")
+				.permitAll()
+				.antMatchers("/auth/**", "/boards/*", "/notes/**")
+				.permitAll()
+				.anyRequest()
+				.authenticated()
+				.and()
+				.addFilter(new JwtAuthenticationFilter(authenticationManager(), getApplicationContext()))
+				.sessionManagement()
+				.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+				.and()
+				.exceptionHandling()
+				.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
+
+		// TODO: /yarb/boards/*
+		// TODO: /yarb/users/*
 	}
-	//TODO: as property file?
+
+	// TODO: as property file?
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 		final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-		source.registerCorsConfiguration("/**", new CorsConfiguration().applyPermitDefaultValues());
+		CorsConfiguration config = new CorsConfiguration().applyPermitDefaultValues();
+		config.addAllowedMethod(HttpMethod.DELETE);
+		config.addAllowedMethod(HttpMethod.PATCH);
+
+		source.registerCorsConfiguration("/**", config);
 
 		return source;
 	}

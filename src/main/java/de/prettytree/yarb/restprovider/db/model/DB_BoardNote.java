@@ -22,10 +22,7 @@ public class DB_BoardNote {
 	private String content;
 
 	@Column(nullable = false)
-	private String author;
-
-	@Column(nullable = false)
-	private long votes = 0;
+	private Long votes = 0L;
 
 	@Column(nullable = false)
 	private LocalDateTime createdAt;
@@ -49,15 +46,7 @@ public class DB_BoardNote {
 		this.content = content;
 	}
 
-	public String getAuthor() {
-		return author;
-	}
-
-	public void setAuthor(String author) {
-		this.author = author;
-	}
-
-	public long getVotes() {
+	public Long getVotes() {
 		return votes;
 	}
 

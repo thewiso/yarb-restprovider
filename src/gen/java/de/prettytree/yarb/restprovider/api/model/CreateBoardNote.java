@@ -5,70 +5,62 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.ArrayList;
-import java.util.List;
 import org.openapitools.jackson.nullable.JsonNullable;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 
 /**
- * CreateBoard
+ * CreateBoardNote
  */
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2019-12-17T19:14:37.694+01:00[Europe/Berlin]")
 
-public class CreateBoard   {
-  @JsonProperty("name")
-  private String name;
+public class CreateBoardNote   {
+  @JsonProperty("content")
+  private String content;
 
-  @JsonProperty("columnNames")
-  @Valid
-  private List<String> columnNames = new ArrayList<>();
+  @JsonProperty("boardColumnId")
+  private Integer boardColumnId;
 
-  public CreateBoard name(String name) {
-    this.name = name;
+  public CreateBoardNote content(String content) {
+    this.content = content;
     return this;
   }
 
   /**
-   * Get name
-   * @return name
+   * Get content
+   * @return content
   */
   @ApiModelProperty(required = true, value = "")
   @NotNull
 
-@Size(min=3) 
-  public String getName() {
-    return name;
+
+  public String getContent() {
+    return content;
   }
 
-  public void setName(String name) {
-    this.name = name;
+  public void setContent(String content) {
+    this.content = content;
   }
 
-  public CreateBoard columnNames(List<String> columnNames) {
-    this.columnNames = columnNames;
-    return this;
-  }
-
-  public CreateBoard addColumnNamesItem(String columnNamesItem) {
-    this.columnNames.add(columnNamesItem);
+  public CreateBoardNote boardColumnId(Integer boardColumnId) {
+    this.boardColumnId = boardColumnId;
     return this;
   }
 
   /**
-   * Get columnNames
-   * @return columnNames
+   * Get boardColumnId
+   * @return boardColumnId
   */
   @ApiModelProperty(required = true, value = "")
   @NotNull
 
-@Size(min=2,max=5) 
-  public List<String> getColumnNames() {
-    return columnNames;
+
+  public Integer getBoardColumnId() {
+    return boardColumnId;
   }
 
-  public void setColumnNames(List<String> columnNames) {
-    this.columnNames = columnNames;
+  public void setBoardColumnId(Integer boardColumnId) {
+    this.boardColumnId = boardColumnId;
   }
 
 
@@ -80,23 +72,23 @@ public class CreateBoard   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    CreateBoard createBoard = (CreateBoard) o;
-    return Objects.equals(this.name, createBoard.name) &&
-        Objects.equals(this.columnNames, createBoard.columnNames);
+    CreateBoardNote createBoardNote = (CreateBoardNote) o;
+    return Objects.equals(this.content, createBoardNote.content) &&
+        Objects.equals(this.boardColumnId, createBoardNote.boardColumnId);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, columnNames);
+    return Objects.hash(content, boardColumnId);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class CreateBoard {\n");
+    sb.append("class CreateBoardNote {\n");
     
-    sb.append("    name: ").append(toIndentedString(name)).append("\n");
-    sb.append("    columnNames: ").append(toIndentedString(columnNames)).append("\n");
+    sb.append("    content: ").append(toIndentedString(content)).append("\n");
+    sb.append("    boardColumnId: ").append(toIndentedString(boardColumnId)).append("\n");
     sb.append("}");
     return sb.toString();
   }

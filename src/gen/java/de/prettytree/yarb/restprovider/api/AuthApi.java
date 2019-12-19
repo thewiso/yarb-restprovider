@@ -28,7 +28,7 @@ import javax.validation.constraints.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2019-10-29T07:51:26.217643+01:00[Europe/Berlin]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2019-12-17T19:14:37.694+01:00[Europe/Berlin]")
 
 @Validated
 @Api(value = "auth", description = "the auth API")
@@ -36,7 +36,7 @@ public interface AuthApi {
 
     @ApiOperation(value = "login", nickname = "login", notes = "Create token by user credentials and get userId", response = LoginData.class, tags={  })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK", response = LoginData.class),
+        @ApiResponse(code = 201, message = "OK", response = LoginData.class),
         @ApiResponse(code = 400, message = "Bad Request: Invalid input"),
         @ApiResponse(code = 401, message = "Unauthorized"),
         @ApiResponse(code = 500, message = "Internal Server Error", response = InternalErrorMessage.class) })

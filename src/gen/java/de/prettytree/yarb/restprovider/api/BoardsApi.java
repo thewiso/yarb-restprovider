@@ -29,7 +29,7 @@ import javax.validation.constraints.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2019-10-29T07:51:26.217643+01:00[Europe/Berlin]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2019-12-17T19:14:37.694+01:00[Europe/Berlin]")
 
 @Validated
 @Api(value = "boards", description = "the boards API")
@@ -39,7 +39,7 @@ public interface BoardsApi {
         @Authorization(value = "bearerAuth")
     }, tags={  })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK", response = CreatedResponse.class),
+        @ApiResponse(code = 201, message = "OK", response = CreatedResponse.class),
         @ApiResponse(code = 401, message = "Unauthorized") })
     @RequestMapping(value = "/boards",
         produces = { "application/json" }, 
@@ -48,7 +48,18 @@ public interface BoardsApi {
     ResponseEntity<CreatedResponse> createBoard(@ApiParam(value = ""  )  @Valid @RequestBody CreateBoard createBoard);
 
 
-    @ApiOperation(value = "getBoards", nickname = "getBoards", notes = "Get boards by owner", response = Board.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "getBoard", nickname = "getBoard", notes = "get board by Id", response = Board.class, tags={  })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK", response = Board.class),
+        @ApiResponse(code = 404, message = "Not Found"),
+        @ApiResponse(code = 500, message = "Internal Server Error", response = InternalErrorMessage.class) })
+    @RequestMapping(value = "/boards/{boardId}",
+        produces = { "application/json" }, 
+        method = RequestMethod.GET)
+    ResponseEntity<Board> getBoard(@ApiParam(value = "",required=true) @PathVariable("boardId") Integer boardId);
+
+
+    @ApiOperation(value = "getBoardsByOwner", nickname = "getBoardsByOwner", notes = "Get boards by owner", response = Board.class, responseContainer = "List", authorizations = {
         @Authorization(value = "bearerAuth")
     }, tags={  })
     @ApiResponses(value = { 
@@ -59,6 +70,6 @@ public interface BoardsApi {
     @RequestMapping(value = "/boards",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<List<Board>> getBoards(@NotNull @ApiParam(value = "", required = true) @Valid @RequestParam(value = "userId", required = true) Integer userId);
+    ResponseEntity<List<Board>> getBoardsByOwner(@NotNull @ApiParam(value = "", required = true) @Valid @RequestParam(value = "userId", required = true) Integer userId);
 
 }

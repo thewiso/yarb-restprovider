@@ -28,7 +28,7 @@ import javax.validation.constraints.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2019-10-29T07:51:26.217643+01:00[Europe/Berlin]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2019-12-17T19:14:37.694+01:00[Europe/Berlin]")
 
 @Validated
 @Api(value = "users", description = "the users API")
@@ -37,7 +37,7 @@ public interface UsersApi {
     @ApiOperation(value = "createUser", nickname = "createUser", notes = "Create new user", tags={  })
     @ApiResponses(value = { 
         @ApiResponse(code = 204, message = "No Content"),
-        @ApiResponse(code = 409, message = "Conflict: username already existing           "),
+        @ApiResponse(code = 409, message = "Conflict: username already existing"),
         @ApiResponse(code = 500, message = "Internal Server Error", response = InternalErrorMessage.class) })
     @RequestMapping(value = "/users",
         produces = { "application/json" }, 

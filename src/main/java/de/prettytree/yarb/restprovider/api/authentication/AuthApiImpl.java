@@ -3,7 +3,6 @@ package de.prettytree.yarb.restprovider.api.authentication;
 import java.util.Arrays;
 import java.util.Optional;
 
-import javax.annotation.PreDestroy;
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
