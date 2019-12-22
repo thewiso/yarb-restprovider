@@ -24,9 +24,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				.csrf()
 				.disable()
 				.authorizeRequests()
-				.antMatchers(HttpMethod.POST, "/users")
+				.antMatchers(HttpMethod.POST, "/users", "/auth/login")
 				.permitAll()
-				.antMatchers("/auth/**", "/boards/*", "/notes/**")
+				.antMatchers("/boards/*", "/notes/**")
 				.permitAll()
 				.anyRequest()
 				.authenticated()
@@ -37,9 +37,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				.and()
 				.exceptionHandling()
 				.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
-
-		// TODO: /yarb/boards/*
-		// TODO: /yarb/users/*
 	}
 
 	// TODO: as property file?

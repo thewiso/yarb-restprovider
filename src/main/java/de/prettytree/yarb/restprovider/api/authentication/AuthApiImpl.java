@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RestController;
 
 import de.prettytree.yarb.restprovider.api.AuthApi;
@@ -25,16 +26,16 @@ import de.prettytree.yarb.restprovider.mapping.UserMapper;
 
 @RestController
 public class AuthApiImpl implements AuthApi {
-	
+
 	private static final Logger LOG = LoggerFactory.getLogger(UsersApiImpl.class);
 	private TokenProvider tokenProvider;
 	private UserDao userDao;
-	
+
 	@Autowired
 	public AuthApiImpl(TokenProvider tokenProvider, UserDao userDao) {
 		this.tokenProvider = tokenProvider;
 		this.userDao = userDao;
-	}	
+	}
 
 	@Override
 	public ResponseEntity<LoginData> login(@Valid UserCredentials userCredentials) {
@@ -52,10 +53,22 @@ public class AuthApiImpl implements AuthApi {
 				LoginData retVal = new LoginData();
 				retVal.setToken(tokenProvider.createToken(user.get().getId()));
 				retVal.setUser(UserMapper.map(user.get()));
-				return new ResponseEntity<LoginData>(retVal, HttpStatus.CREATED);
+				return new ResponseEntity<LoginData>(retVal, HttpStatus.OK);
 			}
 
 		}
 		return new ResponseEntity<LoginData>(HttpStatus.UNAUTHORIZED);
+	}
+
+	//TODO: test
+	@Override
+	public ResponseEntity<LoginData> refreshToken() {
+		long userId = Long.parseLong(SecurityContextHolder.getContext().getAuthentication().getName());
+		Optional<DB_User> user = userDao.findById(userId);
+		
+		LoginData retVal = new LoginData();
+		retVal.setToken(tokenProvider.createToken(user.get().getId()));
+		retVal.setUser(UserMapper.map(user.get()));
+		return new ResponseEntity<LoginData>(retVal, HttpStatus.OK);
 	}
 }
