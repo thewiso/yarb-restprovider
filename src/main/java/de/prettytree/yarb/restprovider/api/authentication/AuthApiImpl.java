@@ -60,7 +60,6 @@ public class AuthApiImpl implements AuthApi {
 		return new ResponseEntity<LoginData>(HttpStatus.UNAUTHORIZED);
 	}
 
-	//TODO: test
 	@Override
 	public ResponseEntity<LoginData> refreshToken() {
 		long userId = Long.parseLong(SecurityContextHolder.getContext().getAuthentication().getName());

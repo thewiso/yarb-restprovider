@@ -1,29 +1,26 @@
 //package de.prettytree.yarb.restprovider.api.board;
 //
 //import java.io.IOException;
-//import java.net.URL;
 //import java.util.List;
 //
-//import javax.persistence.EntityManager;
-//import javax.persistence.PersistenceContext;
 //import javax.ws.rs.ForbiddenException;
 //import javax.ws.rs.NotAuthorizedException;
 //import javax.ws.rs.client.ClientRequestContext;
 //import javax.ws.rs.client.ClientRequestFilter;
-//import javax.ws.rs.core.HttpHeaders;
 //
-//import org.jboss.arquillian.container.test.api.Deployment;
-//import org.jboss.arquillian.junit.Arquillian;
-//import org.jboss.arquillian.persistence.CleanupUsingScript;
 //import org.jboss.arquillian.persistence.UsingDataSet;
-//import org.jboss.arquillian.test.api.ArquillianResource;
-//import org.jboss.resteasy.client.jaxrs.ResteasyClient;
-//import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
-//import org.jboss.shrinkwrap.api.spec.WebArchive;
-//import org.junit.Assert;
-//import org.junit.Before;
-//import org.junit.Test;
-//import org.junit.runner.RunWith;
+//import org.junit.jupiter.api.Test;
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.boot.test.context.SpringBootTest;
+//import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+//import org.springframework.boot.test.web.client.TestRestTemplate;
+//import org.springframework.boot.web.server.LocalServerPort;
+//import org.springframework.http.HttpHeaders;
+//import org.springframework.test.annotation.DirtiesContext;
+//import org.springframework.test.annotation.DirtiesContext.ClassMode;
+//import org.springframework.test.context.ActiveProfiles;
+//import org.springframework.test.context.jdbc.Sql;
+//import org.springframework.util.Assert;
 //
 //import de.prettytree.yarb.restprovider.api.AuthApi;
 //import de.prettytree.yarb.restprovider.api.BoardsApi;
@@ -32,37 +29,23 @@
 //import de.prettytree.yarb.restprovider.api.model.UserCredentials;
 //import de.prettytree.yarb.restprovider.test.TestUtils;
 //
-//@RunWith(Arquillian.class)
-//@CleanupUsingScript(TestUtils.CLEANUP_DB_SCRIPT_PATH)
+//@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+//@DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
+//@ActiveProfiles("test")
 //public class BoardsApiImplTest {
 //
-//	@PersistenceContext
-//	private EntityManager em;
+//	@LocalServerPort
+//	private int port;
 //
-//	private BoardsApi boardsApi;
-//	private AuthApi authApi;
-//	private ResteasyWebTarget target;
+//	@Autowired
+//	private TestUtils testUtils;
 //
-//	@ArquillianResource
-//	private URL contextPath;
+//	@Autowired
+//	private TestRestTemplate restTemplate;
 //
-//	@Deployment
-//	public static WebArchive createDeployment() {
-//		return TestUtils.createDefaultDeployment();
-//	}
-//
-//	@Before
-//	public void init() {
-//		ResteasyClient client = TestUtils.createDefaultResteasyClient();
-//		target = client.target(contextPath + "yarb");
-//
-//		authApi = target.proxy(AuthApi.class);
-//		boardsApi = target.proxy(BoardsApi.class);
-//	}
-//
+//	@Sql(scripts = { TestUtils.TEST_DATA_PATH })
 //	@Test
-//	@UsingDataSet(TestUtils.DATA_SET_PATH)
-//	public void testGetBoardsSuccess() {
+//	public void testGetBoardsByOwnerSuccess() {
 //		UserCredentials credentials = TestUtils.getTestDataCredentials();
 //		LoginData loginData = authApi.login(credentials);
 //
@@ -79,7 +62,7 @@
 //	}
 //
 //	@Test
-//	public void testGetBoardsAuthorisationException() throws Throwable {
+//	public void testGetBoardsByOwnerAuthorisationException() throws Throwable {
 //		TestUtils.assertThrowsException(() -> {
 //			boardsApi.getBoards(1);
 //		}, NotAuthorizedException.class);
@@ -87,7 +70,7 @@
 //
 //	@Test
 //	@UsingDataSet(TestUtils.DATA_SET_PATH)
-//	public void testGetBoardsForbiddenException() throws Throwable {
+//	public void testGetBoardsByOwnerForbiddenException() throws Throwable {
 //		AuthApi authApi = target.proxy(AuthApi.class);
 //		LoginData loginData = authApi.login(TestUtils.getTestDataCredentials());
 //
@@ -105,3 +88,4 @@
 //	}
 //
 //}
+////TODO

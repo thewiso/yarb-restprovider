@@ -19,6 +19,7 @@ public class TestUtils {
 	public static final String TEST_DATA_PATH = "classpath:scripts/testdata.sql";
 
 	public static final String LOGIN_PATH = "/auth/login";
+	public static final String REFRESH_TOKEN_PATH = "/auth/token";
 	public static final String CREATE_USER_PATH = "/users";
 	public static final String GET_USER_PATH = "/users/%d";
 

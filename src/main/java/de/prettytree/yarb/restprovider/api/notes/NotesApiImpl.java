@@ -48,7 +48,6 @@ public class NotesApiImpl implements NotesApi {
 	}
 
 	// TODO: test
-	// TODO: make history?
 	@Override
 	public ResponseEntity<Void> deleteNote(Integer noteId) {
 		Optional<DB_BoardNote> boardNote = boardNoteDao.findById(noteId.longValue());

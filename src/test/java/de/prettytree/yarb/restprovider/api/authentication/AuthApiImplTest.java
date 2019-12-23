@@ -7,6 +7,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
@@ -56,5 +59,31 @@ public class AuthApiImplTest {
 
 		Assertions.assertEquals(1, user.getId().longValue());
 		Assertions.assertEquals("mrfoo", user.getUsername());
+	}
+
+	@Test
+	public void testRefreshTokenWithoutJWT() {
+		Assertions.assertEquals(HttpStatus.UNAUTHORIZED,
+				restTemplate.getForEntity(testUtils.getRestURL(port, TestUtils.REFRESH_TOKEN_PATH), LoginData.class)
+						.getStatusCode());
+	}
+
+	@Sql(scripts = { TestUtils.TEST_DATA_PATH })
+	@Test
+	public void testRefreshTokenWithJWT() throws Throwable {
+		UserCredentials credentials = TestUtils.getTestDataCredentials();
+		LoginData loginData = restTemplate
+				.postForEntity(testUtils.getRestURL(port, TestUtils.LOGIN_PATH), credentials, LoginData.class)
+				.getBody();
+
+		HttpEntity<HttpHeaders> authHeader = new HttpEntity<>(TestUtils.createAuthBearerHeader(loginData.getToken()));
+
+		LoginData newLoginData = restTemplate
+				.exchange(
+						testUtils.getRestURL(port, TestUtils.REFRESH_TOKEN_PATH),
+						HttpMethod.GET, authHeader, LoginData.class)
+				.getBody();
+
+		Assertions.assertEquals(loginData.getUser().getId(), newLoginData.getUser().getId());
 	}
 }
