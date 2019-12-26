@@ -1,7 +1,0 @@
-title: board-column
-type: object
-properties:
-  id:
-    type: integer
-  name:
-    type: string

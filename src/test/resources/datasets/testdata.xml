@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<dataset>
-	<!-- PW: foobar -->
-    <USER ID="1" PASSWORD="r3zq/kSw5WzTEexfaMFTDYN1n40XJZgTwd1fuJNNg5YFHhAMEPx6zY8R1f48bJAKTC28RkmKRc1bY7BcYJqhGSdgvbMPWgBhAx23hRkeiZb4C8cZj7n1gBiwdgGm++03eLRPHK41QM6LwfxkvT4oYakdJysfLin7N+N/ELob+os=" SALT="KIhYw1TuAd+8xVouajL8CKDrm7QO/1gKrsDKLE81p3JvV+ZHeu0egpvWl3tdGqxuh9gFMNVh6WiU6gDO88VPH/fp3/joFOw2tsP0yFNehTkacNDjmYO7qTxG1n+dserI/mruATyLz6joT5Gc0QMnXhsPeRYL7TTCnK4LyoWmWig=" USERNAME="mrfoo"/>
-    
-	<BOARD ID="1" CREATEDAT="2019-10-25 18:38:08.261939000" NAME="Test Board" OWNER_ID="1"/>
-	<BOARD ID="2" CREATEDAT="2019-10-25 18:38:08.261939000" NAME="Retro Board" OWNER_ID="1"/>
-	<BOARD ID="3" CREATEDAT="2019-10-25 18:38:08.261939000" NAME="Retro Board II" OWNER_ID="1"/>
-</dataset>
