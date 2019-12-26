@@ -42,7 +42,7 @@ public class UserApiImplTest {
 
 	@Test
 	@Sql(scripts = { TestUtils.TEST_DATA_PATH })
-	public void testCreateUserForExistingUser() throws Throwable {
+	public void testCreateUserForExistingUser() {
 		UserCredentials userCredentials = TestUtils.getTestUserCredentials();
 		UsersApi usersApi = testUtils.createClientApi(UsersApi.class, port, restTemplate, false);
 
@@ -59,7 +59,7 @@ public class UserApiImplTest {
 		UserCredentials userCredentials = new UserCredentials();
 		userCredentials.setPassword(testPassword);
 		userCredentials.setUsername(testUserName);
-		
+
 		UsersApi usersApi = testUtils.createClientApi(UsersApi.class, port, restTemplate, false);
 
 		usersApi.createUser(userCredentials);
@@ -83,7 +83,7 @@ public class UserApiImplTest {
 
 	@Test
 	@Sql(scripts = { TestUtils.TEST_DATA_PATH })
-	public void testGetUsersAuthorisationException() throws Throwable {
+	public void testGetUsersAuthorisationException() {
 		UsersApi usersApi = testUtils.createClientApi(UsersApi.class, port, restTemplate, false);
 
 		ResponseEntity<User> response = usersApi.getUser(-1);
@@ -92,9 +92,9 @@ public class UserApiImplTest {
 
 	@Test
 	@Sql(scripts = { TestUtils.TEST_DATA_PATH })
-	public void testGetUsersForbiddenException() throws Throwable {
+	public void testGetUsersForbiddenException() {
 		UsersApi usersApi = testUtils.createClientApi(UsersApi.class, port, restTemplate, true);
-		
+
 		ResponseEntity<User> response = usersApi.getUser(TestUtils.TEST_USER_ID + 1);
 		Assertions.assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
 	}

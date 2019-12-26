@@ -34,41 +34,38 @@ public class BoardsApiImpl implements BoardsApi {
 		this.userDao = userDao;
 	}
 
-	// TODO: test for boardColumns
 	@Override
 	public ResponseEntity<List<Board>> getBoardsByOwner(Integer userId) {
 		if (SecurityContextHolder.getContext().getAuthentication().getName().equals(userId.toString())) {
-			List<Board> retVal = boardDao.findByOwnerId(userId.longValue())
-					.stream()
-					.map(dbBoard -> BoardMapper.map(dbBoard))
-					.collect(Collectors.toList());
+			List<Board> retVal = boardDao	.findByOwnerId(userId.longValue())
+											.stream()
+											.map(dbBoard -> BoardMapper.map(dbBoard))
+											.collect(Collectors.toList());
 			return new ResponseEntity<List<Board>>(retVal, HttpStatus.OK);
 		}
 		return new ResponseEntity<List<Board>>(HttpStatus.FORBIDDEN);
 	}
 
-	// TODO: test
 	@Override
 	public ResponseEntity<CreatedResponse> createBoard(@Valid CreateBoard createBoard) {
 		String userId = SecurityContextHolder.getContext().getAuthentication().getName();
 		Optional<DB_User> user = userDao.findById(Long.valueOf(userId));
-		
+
 		DB_Board newBoard = BoardMapper.map(createBoard, user.get());
 		boardDao.save(newBoard);
-		
+
 		CreatedResponse responseEntity = new CreatedResponse();
 		responseEntity.setId(newBoard.getId().intValue());
-		return new ResponseEntity<CreatedResponse>(responseEntity, HttpStatus.CREATED); 
+		return new ResponseEntity<CreatedResponse>(responseEntity, HttpStatus.CREATED);
 	}
 
-	//TODO: test
 	@Override
 	public ResponseEntity<Board> getBoard(Integer boardId) {
 		Optional<DB_Board> board = boardDao.findById(boardId.longValue());
-		if(board.isPresent()) {
+		if (board.isPresent()) {
 			Board retVal = BoardMapper.map(board.get());
 			return new ResponseEntity<Board>(retVal, HttpStatus.OK);
-		}else {
+		} else {
 			return new ResponseEntity<Board>(HttpStatus.NOT_FOUND);
 		}
 	}
