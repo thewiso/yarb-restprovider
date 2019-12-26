@@ -22,7 +22,6 @@ public class BoardMapper {
 		retVal.setId(sourceModel.getId().intValue());
 		retVal.setName(sourceModel.getName());
 
-		//TODO: test
 		List<BoardColumn> columns = sourceModel.getBoardColumns()
 				.stream()
 				.map(board -> BoardColumnMapper.map(board))
@@ -34,7 +33,6 @@ public class BoardMapper {
 	}
 
 	public static DB_Board map(CreateBoard createBoard, DB_User owner) {
-		// TODO: test
 		DB_Board retVal = new DB_Board();
 
 		retVal.setName(createBoard.getName());
