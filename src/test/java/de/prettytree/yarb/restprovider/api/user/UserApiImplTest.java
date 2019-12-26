@@ -9,9 +9,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
@@ -19,7 +16,7 @@ import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 
-import de.prettytree.yarb.restprovider.api.model.LoginData;
+import de.prettytree.yarb.restprovider.api.UsersApi;
 import de.prettytree.yarb.restprovider.api.model.User;
 import de.prettytree.yarb.restprovider.api.model.UserCredentials;
 import de.prettytree.yarb.restprovider.db.dao.UserDao;
@@ -46,10 +43,10 @@ public class UserApiImplTest {
 	@Test
 	@Sql(scripts = { TestUtils.TEST_DATA_PATH })
 	public void testCreateUserForExistingUser() throws Throwable {
-		UserCredentials userCredentials = TestUtils.getTestDataCredentials();
+		UserCredentials userCredentials = TestUtils.getTestUserCredentials();
+		UsersApi usersApi = testUtils.createClientApi(UsersApi.class, port, restTemplate, false);
 
-		ResponseEntity<String> response = restTemplate
-				.postForEntity(testUtils.getRestURL(port, TestUtils.CREATE_USER_PATH), userCredentials, String.class);
+		ResponseEntity<Void> response = usersApi.createUser(userCredentials);
 
 		Assertions.assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
 	}
@@ -62,9 +59,10 @@ public class UserApiImplTest {
 		UserCredentials userCredentials = new UserCredentials();
 		userCredentials.setPassword(testPassword);
 		userCredentials.setUsername(testUserName);
+		
+		UsersApi usersApi = testUtils.createClientApi(UsersApi.class, port, restTemplate, false);
 
-		restTemplate.postForEntity(testUtils.getRestURL(port, TestUtils.CREATE_USER_PATH), userCredentials,
-				String.class);
+		usersApi.createUser(userCredentials);
 
 		DB_User dbUser = userDao.findByUserName(testUserName).get();
 		byte[] hashedPassword = AuthUtils.hashPasswordWithSalt(testPassword, dbUser.getSalt());
@@ -75,18 +73,10 @@ public class UserApiImplTest {
 	@Test
 	@Sql(scripts = { TestUtils.TEST_DATA_PATH })
 	public void testGetUsersSuccess() {
-		UserCredentials credentials = TestUtils.getTestDataCredentials();
-		LoginData loginData = restTemplate
-				.postForEntity(testUtils.getRestURL(port, TestUtils.LOGIN_PATH), credentials, LoginData.class)
-				.getBody();
+		UserCredentials credentials = TestUtils.getTestUserCredentials();
 
-		HttpEntity<HttpHeaders> authHeader = new HttpEntity<>(TestUtils.createAuthBearerHeader(loginData.getToken()));
-
-		User user = restTemplate
-				.exchange(
-						testUtils.getRestURL(port, String.format(TestUtils.GET_USER_PATH, loginData.getUser().getId())),
-						HttpMethod.GET, authHeader, User.class)
-				.getBody();
+		UsersApi usersApi = testUtils.createClientApi(UsersApi.class, port, restTemplate, true);
+		User user = usersApi.getUser(TestUtils.TEST_USER_ID).getBody();
 
 		Assertions.assertEquals(credentials.getUsername(), user.getUsername());
 	}
@@ -94,24 +84,18 @@ public class UserApiImplTest {
 	@Test
 	@Sql(scripts = { TestUtils.TEST_DATA_PATH })
 	public void testGetUsersAuthorisationException() throws Throwable {
-		ResponseEntity<User> response = restTemplate
-				.getForEntity(testUtils.getRestURL(port, String.format(TestUtils.GET_USER_PATH, 42)), User.class);
+		UsersApi usersApi = testUtils.createClientApi(UsersApi.class, port, restTemplate, false);
+
+		ResponseEntity<User> response = usersApi.getUser(-1);
 		Assertions.assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
 	}
 
 	@Test
 	@Sql(scripts = { TestUtils.TEST_DATA_PATH })
 	public void testGetUsersForbiddenException() throws Throwable {
-		UserCredentials credentials = TestUtils.getTestDataCredentials();
-		LoginData loginData = restTemplate
-				.postForEntity(testUtils.getRestURL(port, TestUtils.LOGIN_PATH), credentials, LoginData.class)
-				.getBody();
-
-		HttpEntity<HttpHeaders> authHeader = new HttpEntity<>(TestUtils.createAuthBearerHeader(loginData.getToken()));
-		ResponseEntity<User> response = restTemplate.exchange(
-				testUtils.getRestURL(port, String.format(TestUtils.GET_USER_PATH, loginData.getUser().getId() + 1)),
-				HttpMethod.GET, authHeader, User.class);
-
+		UsersApi usersApi = testUtils.createClientApi(UsersApi.class, port, restTemplate, true);
+		
+		ResponseEntity<User> response = usersApi.getUser(TestUtils.TEST_USER_ID + 1);
 		Assertions.assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
 	}
 

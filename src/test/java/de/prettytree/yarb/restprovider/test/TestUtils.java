@@ -1,5 +1,6 @@
 package de.prettytree.yarb.restprovider.test;
 
+import java.lang.reflect.Proxy;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -8,20 +9,21 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 
+import de.prettytree.yarb.restprovider.api.AuthApi;
+import de.prettytree.yarb.restprovider.api.model.LoginData;
 import de.prettytree.yarb.restprovider.api.model.UserCredentials;
 
 @Component
 public class TestUtils {
 
 	public static final String TEST_DATA_PATH = "classpath:scripts/testdata.sql";
-
-	public static final String LOGIN_PATH = "/auth/login";
-	public static final String REFRESH_TOKEN_PATH = "/auth/token";
-	public static final String CREATE_USER_PATH = "/users";
-	public static final String GET_USER_PATH = "/users/%d";
+	//TODO: https
+	//TODO: test for http get failure!
+	private static final String LOCAL_HOST_URL = "http://localhost:";
 
 	@Value("${server.servlet.context-path}")
 	private String contextPath;
@@ -84,21 +86,50 @@ public class TestUtils {
 
 		return (ExceptionType) throwable;
 	}
-
-	public static UserCredentials getTestDataCredentials() {
+	
+	public static final int TEST_USER_ID = 10;
+	public static UserCredentials getTestUserCredentials() {
 		UserCredentials retVal = new UserCredentials();
 		retVal.setUsername("mrfoo");
 		retVal.setPassword("foobar");
 		return retVal;
 	}
-
-	public String getRestURL(int port, String path) {
-		return "http://localhost:" + port + contextPath + path;
-	}
-
-	public static HttpHeaders createAuthBearerHeader(String token) {
+	
+	private HttpHeaders createTestUserAuthHeader(int port, TestRestTemplate restTemplate) {
+		AuthApi authApi = createClientApi(AuthApi.class, port, restTemplate, false);
+		LoginData loginData = authApi.login(getTestUserCredentials()).getBody();
+		
 		HttpHeaders retVal = new HttpHeaders();
-		retVal.add("Authorization", "Bearer " + token);
+		retVal.add("Authorization", "Bearer " + loginData.getToken());
 		return retVal;
 	}
+
+
+	/**
+	 * Creates a REST client implementation of the given interface
+	 * @param <T> Type of the REST interface
+	 * @param clazz Class of the REST interface
+	 * @param port Port of the server
+	 * @param restTemplate Template which is used for the service calls
+	 * @param authenticate Whether to use a Authorization header of the test user ({@link getTestUserCredentials}) for the service calls
+	 * @return A proxy object of the given interface
+	 */
+	@SuppressWarnings("unchecked")
+	public <T> T createClientApi(Class<T> clazz, int port, TestRestTemplate restTemplate, boolean authenticate) {
+		RestProxyInvocationHandler invocationHandler = null;
+
+		if (authenticate) {
+			HttpHeaders headers = createTestUserAuthHeader(port, restTemplate);
+			invocationHandler = new RestProxyInvocationHandler(LOCAL_HOST_URL + port + contextPath, restTemplate,
+					headers);
+		} else {
+			invocationHandler = new RestProxyInvocationHandler(LOCAL_HOST_URL + port + contextPath, restTemplate);
+		}
+
+		T proxyInstance = (T) Proxy.newProxyInstance(getClass().getClassLoader(), new Class[] { clazz },
+				invocationHandler);
+
+		return proxyInstance;
+	}
+	
 }

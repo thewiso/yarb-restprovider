@@ -24,7 +24,7 @@ import de.prettytree.yarb.restprovider.mapping.BoardMapper;
 
 @RestController
 public class BoardsApiImpl implements BoardsApi {
-//TODO: only autowired constructors!	
+
 	private BoardDao boardDao;
 	private UserDao userDao;
 
