@@ -21,9 +21,7 @@ import de.prettytree.yarb.restprovider.api.model.UserCredentials;
 public class TestUtils {
 
 	public static final String TEST_DATA_PATH = "classpath:scripts/testdata.sql";
-	//TODO: https
-	//TODO: test for http get failure!
-	private static final String LOCAL_HOST_URL = "http://localhost:";
+	private static final String LOCAL_HOST_URL = "https://localhost:";
 
 	@Value("${server.servlet.context-path}")
 	private String contextPath;
