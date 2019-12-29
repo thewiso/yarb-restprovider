@@ -15,6 +15,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -82,6 +83,9 @@ public class RestProxyInvocationHandler implements InvocationHandler {
 			}
 
 			// make service call
+			//configuration for PATCH calls, see https://stackoverflow.com/a/29803488
+			restTemplate.getRestTemplate().setRequestFactory(new HttpComponentsClientHttpRequestFactory());
+			
 			String invocationUrl = urlBuilder.build(urlVariables).toString();
 			ResponseEntity response = restTemplate.exchange(invocationUrl, mapMethod(requestMapping.method()[0]),
 					requestEntity, responseType);

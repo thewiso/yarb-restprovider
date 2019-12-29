@@ -3,8 +3,6 @@ package de.prettytree.yarb.restprovider.api.board;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.transaction.Transactional;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +15,9 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlConfig;
+import org.springframework.test.context.jdbc.SqlConfig.TransactionMode;
+import org.springframework.transaction.annotation.Transactional;
 
 import de.prettytree.yarb.restprovider.api.BoardsApi;
 import de.prettytree.yarb.restprovider.api.model.Board;
@@ -83,8 +84,8 @@ public class BoardsApiImplTest {
 	}
 
 	@Test
-	@Sql(scripts = { TestUtils.TEST_DATA_PATH })
-	@Transactional//TODO: that doesn't seem to work
+	@Sql(scripts = { TestUtils.TEST_DATA_PATH }, config = @SqlConfig(transactionMode = TransactionMode.ISOLATED))
+	@Transactional
 	public void testCreateBoardSuccess() {
 		CreateBoard createBoard = BoardsApiImplTest.generateCreateBoard(5);
 		BoardsApi boardsApi = testUtils.createClientApi(BoardsApi.class, port, restTemplate, true);
@@ -94,11 +95,11 @@ public class BoardsApiImplTest {
 		Assertions.assertEquals(createBoard.getName(), board.getName());
 		Assertions.assertEquals(createBoard.getColumnNames().size(), board.getBoardColumns().size());
 
-		List<String> actualColumnNames = board	.getBoardColumns()
-												.stream()
-												.map(boardColumn -> boardColumn.getName())
-												.collect(Collectors.toList());
-		
+		List<String> actualColumnNames = board.getBoardColumns()
+				.stream()
+				.map(boardColumn -> boardColumn.getName())
+				.collect(Collectors.toList());
+
 		Assertions.assertEquals(createBoard.getColumnNames(), actualColumnNames);
 	}
 
@@ -118,7 +119,7 @@ public class BoardsApiImplTest {
 		BoardsApi boardsApi = testUtils.createClientApi(BoardsApi.class, port, restTemplate, false);
 		Assertions.assertEquals(HttpStatus.NOT_FOUND, boardsApi.getBoard(-1).getStatusCode());
 	}
-	
+
 	@Sql(scripts = { TestUtils.TEST_DATA_PATH })
 	@Test
 	public void testGetBoard() {

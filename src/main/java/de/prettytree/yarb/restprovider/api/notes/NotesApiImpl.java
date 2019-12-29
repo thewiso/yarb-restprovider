@@ -31,7 +31,6 @@ public class NotesApiImpl implements NotesApi {
 		this.boardNoteDao = boardNoteDao;
 	}
 
-	// TODO: test
 	@Override
 	public ResponseEntity<CreatedResponse> createNote(@Valid CreateBoardNote createBoardNote) {
 		Optional<DB_BoardColumn> boardColumn = boardColumnDao.findById(createBoardNote.getBoardColumnId().longValue());
@@ -47,7 +46,6 @@ public class NotesApiImpl implements NotesApi {
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 
-	// TODO: test
 	@Override
 	public ResponseEntity<Void> deleteNote(Integer noteId) {
 		Optional<DB_BoardNote> boardNote = boardNoteDao.findById(noteId.longValue());
@@ -58,7 +56,6 @@ public class NotesApiImpl implements NotesApi {
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 
-	// TODO: test
 	@Override
 	public ResponseEntity<Void> updateNote(Integer noteId, @Valid UpdateBoardNote updateBoardNote) {
 		Optional<DB_BoardNote> boardNote = boardNoteDao.findById(noteId.longValue());
@@ -72,7 +69,6 @@ public class NotesApiImpl implements NotesApi {
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 
-	// TODO: test
 	@Override
 	public ResponseEntity<Void> deleteVote(Integer noteId) {
 		Optional<DB_BoardNote> boardNote = boardNoteDao.findById(noteId.longValue());
@@ -91,7 +87,6 @@ public class NotesApiImpl implements NotesApi {
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 
-	// TODO: test
 	@Override
 	public ResponseEntity<Void> postVote(Integer noteId) {
 		Optional<DB_BoardNote> boardNote = boardNoteDao.findById(noteId.longValue());
