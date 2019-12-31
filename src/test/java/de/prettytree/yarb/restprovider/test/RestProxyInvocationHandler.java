@@ -4,11 +4,26 @@ import java.lang.reflect.Array;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.net.ssl.SSLContext;
+
+import org.apache.http.client.HttpClient;
+import org.apache.http.config.RegistryBuilder;
+import org.apache.http.conn.socket.ConnectionSocketFactory;
+import org.apache.http.conn.socket.PlainConnectionSocketFactory;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.ssl.SSLContextBuilder;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ResolvableType;
 import org.springframework.http.HttpEntity;
@@ -82,10 +97,14 @@ public class RestProxyInvocationHandler implements InvocationHandler {
 				isListResponseType = true;
 			}
 
+			// configuration for PATCH calls, see https://stackoverflow.com/a/29803488
+			HttpComponentsClientHttpRequestFactory clientRequestFactory = new HttpComponentsClientHttpRequestFactory();
+			restTemplate.getRestTemplate().setRequestFactory(clientRequestFactory);
+
+			// configuration for self signed certificate
+			clientRequestFactory.setHttpClient(RestProxyInvocationHandler.createAllTrustingClient());
+
 			// make service call
-			//configuration for PATCH calls, see https://stackoverflow.com/a/29803488
-			restTemplate.getRestTemplate().setRequestFactory(new HttpComponentsClientHttpRequestFactory());
-			
 			String invocationUrl = urlBuilder.build(urlVariables).toString();
 			ResponseEntity response = restTemplate.exchange(invocationUrl, mapMethod(requestMapping.method()[0]),
 					requestEntity, responseType);
@@ -105,4 +124,20 @@ public class RestProxyInvocationHandler implements InvocationHandler {
 		return HttpMethod.valueOf(method.name());
 	}
 
+	//https://stackoverflow.com/a/38509015
+	//USE ONLY FOR TESTING!
+	private static HttpClient createAllTrustingClient() throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException {
+		final SSLContext sslContext = new SSLContextBuilder().loadTrustMaterial(null, (x509CertChain, authType) -> true)
+				.build();
+
+		return HttpClientBuilder.create()
+				.setSSLContext(sslContext)
+				.setConnectionManager(
+						new PoolingHttpClientConnectionManager(RegistryBuilder.<ConnectionSocketFactory>create()
+								.register("http", PlainConnectionSocketFactory.INSTANCE)
+								.register("https",
+										new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE))
+								.build()))
+				.build();
+	}
 }
